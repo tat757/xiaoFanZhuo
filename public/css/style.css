@@ -1,0 +1,9 @@
+#titleBar {
+	background: grey;
+	margin-top: -10px;
+	margin-left: -5px;
+	margin-right: -5px;
+	height: 20px;
+	width: 100%;
+	-webkit-app-region: drag;
+}
