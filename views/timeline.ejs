@@ -1,11 +1,16 @@
-<!DOCTYPE html>
-<html>
-	<head>
-		<title>xfz</title>
-		<link type="text/css" href="/public/css/style.css" rel="stylesheet">
-	</head>
-	<body>
-		<input type="text" id="inputArea">
-		<a href="/timeline/post">发布</a>
-	</body>
-</html>
+<div ng-controller="timeline">
+	<input type="text" ng-model="input.text">
+	<button ng-click="postStatus()">发布</button>
+	<button ng-click="logout()">注销</button>
+	<hr>
+	<div ng-repeat="status in statuses">
+		<div style="min-height:50px; background-color: gray; margin-left: 50px;">
+			<a ng-href="" style="float: left; margin-left: -48px; height:32px; width:32px;"><img ng-src="{{status.user.profile_image_url}}" alt="{{status.user.name}}"></a>
+			<a ng-href="" style="float:left; margin-right: 4.2px;">
+				<h6>{{status.user.name}}</h6>
+			</a>
+			<span style="text-overflow: ellipsis; white-space: pre-line;"><h6>{{status.text}}</h6></span>
+		</div>
+		<hr>
+	</div>
+</div>

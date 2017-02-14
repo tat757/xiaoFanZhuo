@@ -9,7 +9,9 @@ var expressApp = express();
 var Config = require('electron-config');
 var config = new Config();
 
-var index = require('./router/main');
+var action = require('./router/action');
+var index = require('./router/index');
+var user = require('./router/user');
 
 // 保持一个对于 window 对象的全局引用，不然，当 JavaScript 被 GC，
 // window 会被自动地关闭
@@ -19,20 +21,31 @@ var init = function(){
     var windowOption = {
         width: 400, 
         height: 600,
-        resizable: false,
+        resizable: true,
         autoHideMenuBar: true,
         backgroundColor: '#F7FCFF'
     };
     mainWindow = new BrowserWindow(windowOption);
-    mainWindow.webContents.openDevTools();
 
     expressApp.set('views', __dirname + '/views');
     expressApp.set('view engine', 'ejs');
+    mainWindow.webContents.openDevTools()
 
+    expressApp.use(bodyParser.json());
     expressApp.use(bodyParser.urlencoded({extended: false}));
 
     expressApp.use('/', index);
+    expressApp.use('/page', express.static(__dirname + '/views'));
     expressApp.use('/public', express.static(__dirname + '/public'));
+    expressApp.use('/module', express.static(__dirname + '/node_modules'));
+
+    expressApp.use('/action', action);
+    expressApp.use('/user', user);
+
+    expressApp.use(function(req, res, next) {
+        res.setHeader('Access-Control-Allow-Origin', 'http://127.0.0.1:3000/');
+        next();
+    });
 
     mainWindow.on('closed', function(){
         mainWindow = null;

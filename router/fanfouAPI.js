@@ -1,4 +1,4 @@
-var OAuth = require('OAuth').OAuth;
+var OAuth = require('oauth').OAuth;
 var CONFIG = require('../config');
 var FANFOU_URL = {
 	REQUEST_TOKEN_URL: 'http://fanfou.com/oauth/request_token',
@@ -65,24 +65,39 @@ FanfouAPI.prototype.getOAuthAccessToken = function(oauth, next){
 	});
 };
 
-FanfouAPI.prototype.getRequest = function(url, failed, success){
-	this.oauth.get(url, this.access_token, this.access_token_secret, function(err, body, res){
-		if(!err && res.statusCode == 200){
-			success(body);
+FanfouAPI.prototype.getCurrUserHomeTimeline = function(err, res){
+	var path = '/statuses/home_timeline.json?count=40';
+	var url = this.apiBaseURL + path;
+	this.getRequest(url, err, res);
+}
+
+FanfouAPI.prototype.postStatus = function(data, err, res){
+	var path = '/statuses/update.json';
+	var data = {"status": data.text };
+	var url = this.apiBaseURL + path;
+	this.postRequest(url, data, err, res);
+}
+
+FanfouAPI.prototype.getRequest = function(url, err, res){
+	console.log(this.access_token);
+	console.log(this.access_token_secret);
+	this.oauth.get(url, this.access_token, this.access_token_secret, function(error, body, result){
+		if(!error && result.statusCode == 200){
+			res(body);
 		}
 		else{
-			failed(err, res, body);
+			err(error, result, body);
 		}
 	});
 };
 
-FanfouAPI.prototype.postRequest = function(url, data, failed, success){
-	this.oauth.post(url, this.access_token, this.access_token_secret, data, function(err, body, res){
-		if(!err && res.statusCode == 200){
-			success(body);
+FanfouAPI.prototype.postRequest = function(url, data, err, res){
+	this.oauth.post(url, this.access_token, this.access_token_secret, data, function(error, body, result){
+		if(!error && result.statusCode == 200){
+			res(body);
 		}
 		else{
-			failed(err, res, body);
+			err(error, result, body);
 		}
 	});
 };
