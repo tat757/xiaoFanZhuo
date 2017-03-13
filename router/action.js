@@ -6,6 +6,7 @@ var fanfou = new FanfouAPI();
 var config = new Config();
 
 router.get('/authorize', function(req, res){
+	console.log('/authorize');
 	if(config.get('access_token')){
 		return res.json({success: true, message: 'Cookie'});
 	}

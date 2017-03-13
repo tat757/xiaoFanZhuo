@@ -1,13 +1,12 @@
 var electron = require('electron');
+var path = require('path');
+var url = require('url');
 var app = electron.app;  // 控制应用生命周期的模块。
 var BrowserWindow = electron.BrowserWindow;  // 创建原生浏览器窗口的模块
 
 var express = require('express');
 var bodyParser = require('body-parser');
 var expressApp = express();
-
-var Config = require('electron-config');
-var config = new Config();
 
 var action = require('./router/action');
 var index = require('./router/index');
@@ -18,25 +17,25 @@ var user = require('./router/user');
 var mainWindow = null;
 
 var init = function(){
-    var windowOption = {
-        width: 400, 
+    var windowStyle = {
+        width: 600, 
         height: 600,
         resizable: true,
         autoHideMenuBar: true,
-        backgroundColor: '#F7FCFF'
+        backgroundColor: 'white'
     };
-    mainWindow = new BrowserWindow(windowOption);
+    mainWindow = new BrowserWindow(windowStyle);
 
-    expressApp.set('views', __dirname + '/views');
+    mainWindow.webContents.openDevTools();
+
+    expressApp.set('views', path.join(__dirname, 'views'));
     expressApp.set('view engine', 'ejs');
-    mainWindow.webContents.openDevTools()
-
     expressApp.use(bodyParser.json());
-    expressApp.use(bodyParser.urlencoded({extended: false}));
-
+    expressApp.use(bodyParser.urlencoded({ extended: false }));
+    
     expressApp.use('/', index);
     expressApp.use('/page', express.static(__dirname + '/views'));
-    expressApp.use('/public', express.static(__dirname + '/public'));
+    expressApp.use('/src', express.static(__dirname + '/src'));
     expressApp.use('/module', express.static(__dirname + '/node_modules'));
 
     expressApp.use('/action', action);
@@ -55,7 +54,7 @@ var init = function(){
         console.log('Port 3000 is running');
     });
 
-    mainWindow.loadURL('http://127.0.0.1:3000');
+    mainWindow.loadURL('http://127.0.0.1:3000/');
 };
 
 // 当所有窗口被关闭了，退出。
