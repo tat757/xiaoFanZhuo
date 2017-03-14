@@ -37,6 +37,14 @@ var xfz = {
 				break;
 		}
 	},
+	setStyle : function(id, styles){
+		for(style in styles){
+			console.log('id: ' + id);
+			console.log('styles: ');
+			console.log(styles);
+			id.style[style] = styles[style];
+		}
+	},
 	appendChilds : function(parent, array){
 		for(id in array){
 			parent.appendChild(array[id]);
@@ -55,11 +63,37 @@ var xfz = {
 		timeline : function(){
 			container.innerHTML = '';
 			var div = document.createElement('div');
-			var inputArea = document.createElement('input');
+			var inputContainer = document.createElement('div');
+			var inputArea = document.createElement('textarea');
 			var postBt = document.createElement('button');
 			var logoutBt = document.createElement('button');
-			xfz.appendChilds(div, [inputArea, postBt, logoutBt]);
+			var inputAreaStyle = {
+				boxSizing : 'border-box',
+				width : '310px',
+				paddingLeft : '5px',
+				paddingright : '5px',
+				marginLeft : '40px',
+				resize : 'none'
+			};
+			xfz.setStyle(inputArea, inputAreaStyle);
+			var inputContainerStyle = {
+				paddingLeft : '5px',
+				paddingRight : '5px',
+				paddingBotton : '0px'
+			};
+			xfz.setStyle(inputContainer, inputContainerStyle);
+			var postBtStyle = {
+				float : 'right',
+				paddingRight : '5px',
+				marginTop: '-5px'
+			}
+			xfz.setStyle(postBt, postBtStyle);
+
+			xfz.appendChilds(inputContainer, [inputArea, postBt]);
+			xfz.appendChilds(div, [inputContainer]);
 			container.appendChild(div);
+			postBt.innerHTML = '发布';
+			logoutBt.innerHTML = '注销';
 		},
 	}
 };

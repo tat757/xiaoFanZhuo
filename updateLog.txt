@@ -1,3 +1,6 @@
+0.2.1
+-添加CSS到timeline页面
+
 0.2.0 使用DOM技术重构 Rebuild the app with DOM
 -移除AngularJs组件 Removed angularJS
 

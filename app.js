@@ -18,9 +18,8 @@ var mainWindow = null;
 
 var init = function(){
     var windowStyle = {
-        width: 600, 
-        height: 600,
-        resizable: true,
+        width: 376, 
+        height: 640,
         autoHideMenuBar: true,
         backgroundColor: 'white'
     };
@@ -28,7 +27,7 @@ var init = function(){
 
     mainWindow.webContents.openDevTools();
 
-    expressApp.set('views', path.join(__dirname, 'views'));
+    expressApp.set('views', path.join(__dirname));
     expressApp.set('view engine', 'ejs');
     expressApp.use(bodyParser.json());
     expressApp.use(bodyParser.urlencoded({ extended: false }));
