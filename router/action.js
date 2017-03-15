@@ -1,5 +1,4 @@
 var router = require('express').Router();
-var OAuth = require('OAuth');
 var http = require('http');
 var fs = require('fs');
 var Config = require('electron-config');

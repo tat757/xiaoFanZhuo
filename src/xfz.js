@@ -79,7 +79,7 @@ var xfz = {
 			});
 		},
 		timeline : function(){
-			container.innerHTML = '';
+			container.innerHTML = '加载中..';
 			var div = document.createElement('div');
 			var inputContainer = document.createElement('div');
 			var inputArea = document.createElement('textarea');
@@ -118,7 +118,6 @@ var xfz = {
 
 			xfz.appendChilds(inputContainer, [currUserAvatar, inputArea, postBt, logoutBt]);
 			xfz.appendChilds(div, [inputContainer]);
-			container.appendChild(div);
 			postBt.innerHTML = '发布';
 			logoutBt.innerHTML = '注销';
 
@@ -133,6 +132,8 @@ var xfz = {
 					xfz.status.currUser = data.data;
 					xfz.Get('/action/getCurrAvatar', function(data){
 						currUserAvatar.src = 'data:image/jpeg;base64,' + data.data.image;
+						container.innerHTML = '';
+						container.appendChild(div);
 					});
 				}
 			});

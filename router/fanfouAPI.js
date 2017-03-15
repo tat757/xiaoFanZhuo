@@ -1,4 +1,4 @@
-var OAuth = require('oauth').OAuth;
+var OAuth = require('oauth');
 var CONFIG = require('../config');
 var FANFOU_URL = {
 	REQUEST_TOKEN_URL: 'http://fanfou.com/oauth/request_token',
@@ -14,7 +14,7 @@ var FanfouAPI = function(){
 	this.accessTokenURL = FANFOU_URL.ACCESS_TOKEN_URL;
 	this.authorizeURL = FANFOU_URL.AUTHORIZE_URL;
 	this.apiBaseURL = FANFOU_URL.BASE_URL;
-	this.oauth = new OAuth(
+	this.oauth = new OAuth.OAuth(
 		this.requestTokenURL,
 		this.accessTokenURL,
 		this.consumerKey,

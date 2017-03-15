@@ -1,3 +1,7 @@
+0.4.0 设置packager | Config packager
+-添加打包参数		| Added the settings for packager
+-修复造成打包错误的代码 	| Fixed several error which was causing packaging fail
+
 0.3.0 连接饭否API
 -添加使用API获取饭否服务器数据 Added code to connect with fanfou server by using fanfouAPI
 -修复头像本地储存问题 Fixed avatar local storage problem
