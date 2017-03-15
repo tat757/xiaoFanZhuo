@@ -71,6 +71,12 @@ FanfouAPI.prototype.getCurrUserHomeTimeline = function(err, res){
 	this.getRequest(url, err, res);
 }
 
+FanfouAPI.prototype.getCurrUser = function(err, res){
+	var path = '/users/show.json';
+	var url = this.apiBaseURL + path;
+	this.getRequest(url, err, res);
+}
+
 FanfouAPI.prototype.postStatus = function(data, err, res){
 	var path = '/statuses/update.json';
 	var data = {"status": data.text };

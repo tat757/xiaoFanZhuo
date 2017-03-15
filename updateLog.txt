@@ -1,5 +1,9 @@
+0.3.0 连接饭否API
+-添加使用API获取饭否服务器数据 Added code to connect with fanfou server by using fanfouAPI
+-修复头像本地储存问题 Fixed avatar local storage problem
+
 0.2.1
--添加CSS到timeline页面
+-添加CSS到timeline页面 Added styles to timeline page
 
 0.2.0 使用DOM技术重构 Rebuild the app with DOM
 -移除AngularJs组件 Removed angularJS

@@ -2,7 +2,10 @@ var container = document.getElementById('container');
 var httpRequest = new XMLHttpRequest();
 var xfz = {
 	status : {
-		page : 'welcome'
+		page : 'welcome',
+		currUser : {
+			unique_id : ''
+		}
 	},
 	init : function(){
 		xfz.status.page = 'welcome';
@@ -19,8 +22,20 @@ var xfz = {
 		httpRequest.open('GET', url, true);
 		httpRequest.send();
 	},
+	Post : function(url, data, callback){
+		httpRequest.open('POST', url, true);
+		httpRequest.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+
+		http.onreadystatechange = function(){
+			if(this.readyState == 4 && this.status == 200){
+				if(callback){
+					callback(JSON.parse(this.responseText));
+				}
+			}
+		};
+		httpRequest.send(data);
+	},
 	setPage : function(){
-		console.log('xfz.status.page: ' + xfz.status.page);
 		switch(xfz.status.page){
 			case 'welcome' : 
 				xfz.page.welcome();
@@ -32,16 +47,12 @@ var xfz = {
 				xfz.page.logout();
 				break;
 			case 'timeline' :
-				console.log('switch');
 				xfz.page.timeline();
 				break;
 		}
 	},
 	setStyle : function(id, styles){
 		for(style in styles){
-			console.log('id: ' + id);
-			console.log('styles: ');
-			console.log(styles);
 			id.style[style] = styles[style];
 		}
 	},
@@ -54,9 +65,16 @@ var xfz = {
 		welcome : function(){
 			container.innerHTML = '请稍候..';
 			xfz.Get('/action/authorize', function(data){
+				xfz.status.page = 'timeline';
+				xfz.setPage();
+			});
+		},
+		logout : function(){
+			container.innerHTML = '载入中..';
+			var div = document.createElement('div');
+			xfz.Get('/action/logout', function(data){
 				if(data.success){
-					xfz.status.page = 'timeline';
-					xfz.setPage();
+					container.innerHTML = '登出成功!';
 				}
 			});
 		},
@@ -67,13 +85,14 @@ var xfz = {
 			var inputArea = document.createElement('textarea');
 			var postBt = document.createElement('button');
 			var logoutBt = document.createElement('button');
+			var currUserAvatar = document.createElement('img');
 			var inputAreaStyle = {
 				boxSizing : 'border-box',
 				width : '310px',
 				paddingLeft : '5px',
-				paddingright : '5px',
-				marginLeft : '40px',
-				resize : 'none'
+				paddingRight : '5px',
+				resize : 'none',
+				display : 'inline-block'
 			};
 			xfz.setStyle(inputArea, inputAreaStyle);
 			var inputContainerStyle = {
@@ -86,14 +105,38 @@ var xfz = {
 				float : 'right',
 				paddingRight : '5px',
 				marginTop: '-5px'
-			}
+			};
 			xfz.setStyle(postBt, postBtStyle);
+			var currUserAvatarStyle = {
+				width : '32px',
+				paddingRight : '4px',
+				paddingLeft : '4px',
+				paddingBottom : '6px',
+				display : 'inline-block'
+			};
+			xfz.setStyle(currUserAvatar, currUserAvatarStyle);
 
-			xfz.appendChilds(inputContainer, [inputArea, postBt]);
+			xfz.appendChilds(inputContainer, [currUserAvatar, inputArea, postBt, logoutBt]);
 			xfz.appendChilds(div, [inputContainer]);
 			container.appendChild(div);
 			postBt.innerHTML = '发布';
 			logoutBt.innerHTML = '注销';
+
+			logoutBt.addEventListener('click', function(e){
+					var target = e.target;
+					xfz.status.page = 'logout';
+					xfz.setPage();
+				}, false);
+
+			xfz.Get('/action/getCurrUser', function(data){
+				if(data.success){
+					xfz.status.currUser = data.data;
+					xfz.Get('/action/getCurrAvatar', function(data){
+						currUserAvatar.src = 'data:image/jpeg;base64,' + data.data.image;
+					});
+				}
+			});
+
 		},
 	}
 };
