@@ -8,14 +8,12 @@ var fanfou = new FanfouAPI();
 var config = new Config();
 
 router.get('/authorize', function(req, res){
-	console.log('/authorize');
 	if(config.get('access_token')){
 		fanfou.access_token = config.get('access_token');
 		fanfou.access_token_secret = config.get('access_token_secret');
 		return res.json({success: true});
 	}
 	else{
-		console.log('here');
 		fanfou.getOAuthRequestToken(function(oauth){
 			var redirectUrl = fanfou.authorizeURL + '?oauth_token=' + oauth.token + '&oauth_callback=http://127.0.0.1:3000/action/authorize/callback';
 			fanfou.token = oauth.token;
@@ -27,7 +25,6 @@ router.get('/authorize', function(req, res){
 
 router.get('/authorize/callback', function(req, res){
 	fanfou.getOAuthAccessToken(fanfou.oauth, function(oauth){
-		console.log(oauth);
 		fanfou.access_token = oauth.access_token;
 		fanfou.access_token_secret = oauth.access_token_secret;
 		config.set('access_token', oauth.access_token);
@@ -51,28 +48,20 @@ router.get('/getCurrUser', function(req, res){
 			var saveAvatar = function(callback){
 				fs.access(app.getPath('appData') + '/xiaoFanZhuo/' + fanfou.userId + '/avatar/' + fanfou.userId + '.jpg', function(err){
 					if(err){
-						console.log('here');
 						var image = fs.createWriteStream(app.getPath('appData') + '/xiaoFanZhuo/' + fanfou.userId + '/avatar/' + fanfou.userId + '.jpg');
 						http.get(data.profile_image_url, function(response){
 							response.pipe(image);
 							callback(null);
 						});
 					}
-					else{
-						callback(null);
-					}
+					callback(null);
 				});
 			};
 			var checkAvatarFolder = function(callback){
 				fs.access(app.getPath('appData') + '/xiaoFanZhuo/' + fanfou.userId + '/avatar', function(err){
 					if(err){
 						fs.mkdir(app.getPath('appData') + '/xiaoFanZhuo/' + fanfou.userId + '/avatar', 0777, function(error){
-							if(error){
-								callback(error);
-							}
-							else{
-								callback(null);
-							}
+							callback(null);
 						});
 					}
 					else{
@@ -84,12 +73,7 @@ router.get('/getCurrUser', function(req, res){
 				fs.access(app.getPath('appData') + '/xiaoFanZhuo/' + fanfou.userId, function(err){
 					if(err){
 						fs.mkdir(app.getPath('appData') + '/xiaoFanZhuo/' + fanfou.userId, 0777, function(error){
-							if(error){
-								callback(error);
-							}
-							else{
-								callback(null);
-							}
+							callback(null);
 						});
 					}
 					else{
@@ -98,29 +82,12 @@ router.get('/getCurrUser', function(req, res){
 				});
 			}
 			checkUserFolder(function(err){
-				if(err){
-					return res.json({success: false, data: err});
-				}
-				else{
-					checkAvatarFolder(function(err){
-						if(err){
-							return res.json({success: false, data: err});
-						}
-						else{
-							saveAvatar(function(err){
-								if(err){
-									return res.json({success: false, data: err});
-								}
-								else{
-									return res.json({success: true, data: data});
-								}
-							});
-						}
+				checkAvatarFolder(function(err){
+					saveAvatar(function(err){
 					});
-				}
+				});
 			});
-				
-			
+			return res.json({success: true, data: data});
 		});
 });
 
@@ -134,6 +101,18 @@ router.get('/getCurrAvatar', function(req, res){
 			return res.json({success: true, data: {image: image}});
 		}
 	});
+});
+
+router.get('/getCurrUserHomeTimeline', function(req, res){
+	fanfou.getCurrUserHomeTimeline(
+		function(){
+
+		},
+		function(data){
+			data = JSON.parse(data);
+			return res.json({success: true, data: data});
+		}
+	);
 });
 
 router.get('/logout', function(req, res){

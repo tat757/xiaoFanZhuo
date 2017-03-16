@@ -1,3 +1,7 @@
+0.4.1 
+-添加timeline相关代码 | Added code related to timeline
+-修复get和post的链接问题 | Fixed the connecting problem related to get and post 
+
 0.4.0 设置packager | Config packager
 -添加打包参数		| Added the settings for packager
 -修复造成打包错误的代码 	| Fixed several error which was causing packaging fail
