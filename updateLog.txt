@@ -1,3 +1,6 @@
+0.4.2
+-添加timeline的结构 | Adding the layout of timeline
+
 0.4.1 
 -添加timeline相关代码 | Added code related to timeline
 -修复get和post的链接问题 | Fixed the connecting problem related to get and post 
