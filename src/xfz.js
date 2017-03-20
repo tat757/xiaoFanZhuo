@@ -27,11 +27,13 @@ var xfz = {
 		httpRequest.send();
 	},
 	Post : function(url, data, callback){
+		console.log(data);
 		httpRequest = new XMLHttpRequest();
 		httpRequest.open('POST', url, true);
-		httpRequest.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+		data = JSON.stringify(data);
+		httpRequest.setRequestHeader('Content-type', 'application/json');
 
-		http.onreadystatechange = function(){
+		httpRequest.onreadystatechange = function(){
 			if(this.readyState == 4 && this.status == 200){
 				if(callback){
 					callback(JSON.parse(this.responseText));
@@ -101,6 +103,13 @@ var xfz = {
 				xfz.setPage();
 			}, false);
 
+		postBt.addEventListener('click', function(e){
+			var target = e.target;
+			xfz.Post('/action/postStatus', {text: document.getElementById('inputArea').value}, function(data){
+				document.getElementById('inputArea').value = 'sent';
+			});
+		}, false);
+
 		xfz.appendChilds(inputContainer, [currUserAvatar, inputArea, postBt, logoutBt]);
 
 		return inputContainer;
@@ -155,8 +164,6 @@ var xfz = {
 						bodyContainer.appendChild(timeline);
 						for(count in data.data){
 							var status = data.data[count];
-							console.log('status');
-							console.log(status);
 							var li = document.createElement('li');
 							var liStyle = {
 								width : '320px',
@@ -227,8 +234,27 @@ var xfz = {
 								marginLeft : '-40px',
 							}
 							xfz.setStyle(hr, hrStyle);
+							if(count == 0){
+								li.classList.add('first');
+							}
+							if(count == data.data.length - 1){
+								if(!li.classList.contains('first')){
+									li.classList.add('last');
+								}
+							}
 							li.appendChild(hr);
 							ol.appendChild(li);
+						}
+						if(data.data.length >= 10){
+							timeline.addEventListener('scroll', function(e){
+								var target = e.target;
+								var top = target.scrollTop;
+								var height = target.scrollHeight;
+								var currHeight = target.clientHeight;
+								var gap = top / (height - currHeight) * 100;
+								console.log(gap);
+
+							}, false);
 						}
 					}
 				});
@@ -297,22 +323,18 @@ var xfz = {
 			
 
 			xfz.Get('/action/getCurrUser', function(data){
-				console.log(data);
 				if(data.success){
 					var inputContainer = xfz.setInput();
-					console.log(inputContainer);
 					xfz.status.currUser = data.data;
 					container.innerHTML = '';
 					xfz.appendChilds(div, [inputContainer, navBarContainer, bodyContainer]);
 					container.appendChild(div);
 					xfz.Get('/action/getCurrAvatar', function(img){
-						console.log(img);
 						document.getElementById('currUserAvatar').src = 'data:image/jpeg;base64,' + img.data.image;
 					});
 					xfz.status.nav = 'timeline';
 					xfz.status.notCurrUser = false;
 					xfz.setBody();
-					console.log(document.getElementById('currUserAvatar'));
 				}
 			});
 

@@ -66,7 +66,7 @@ FanfouAPI.prototype.getOAuthAccessToken = function(oauth, next){
 };
 
 FanfouAPI.prototype.getCurrUserHomeTimeline = function(err, res){
-	var path = '/statuses/home_timeline.json?count=40';
+	var path = '/statuses/home_timeline.json?count=10';
 	var url = this.apiBaseURL + path;
 	this.getRequest(url, err, res);
 }

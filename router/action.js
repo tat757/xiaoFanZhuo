@@ -122,6 +122,7 @@ router.get('/logout', function(req, res){
 });
 
 router.post('/postStatus', function(req, res){
+	console.log(req.body);
 	var text = req.body.text;
 	fanfou.access_token = config.get('access_token');
 	fanfou.access_token_secret = config.get('access_token_secret');
