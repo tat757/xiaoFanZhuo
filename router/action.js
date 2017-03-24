@@ -138,4 +138,20 @@ router.post('/postStatus', function(req, res){
 		});
 });
 
+router.post('/getTimelineBeforeLast', function(req, res){
+	var id = req.body.contentId;
+	fanfou.access_token = config.get('access_token');
+	fanfou.access_token_secret = config.get('access_token_secret');
+	fanfou.getTimelineBeforeLast(
+		id,
+		function(){
+
+		},
+		function(data){
+			data = JSON.parse(data);
+			return res.json({success: true, data: data});
+		}
+	);
+});
+
 module.exports = router;

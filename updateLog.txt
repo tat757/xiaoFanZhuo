@@ -1,3 +1,6 @@
+0.5.1 
+-添加载入旧信息功能 | Added loading old posts feature
+
 0.5.0 添加发布功能 	| 	Added posting feature
 -添加发布信息的功能	|	Added main feature post message
 -添加更多代码到timeline	| Added more code to timeline

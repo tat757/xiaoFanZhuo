@@ -8,6 +8,7 @@ var xfz = {
 		},
 		nav : 'home',
 		notMain : false,
+		loadingContent : false
 	},
 	init : function(){
 		document.body.style.overflowY = 'hidden';
@@ -114,6 +115,90 @@ var xfz = {
 
 		return inputContainer;
 	},
+	setTimeline : function(ol, data){
+		for(count in data){
+			var status = data[count];
+			var li = document.createElement('li');
+			var liStyle = {
+				width : '320px',
+				minHeight : '60px',
+				listStyleType : 'none'
+			};
+			xfz.setStyle(li, liStyle);
+			var userAvatarCell = document.createElement('a');
+			var userAvatarCellStyle = {
+				display : 'inline-block',
+				width : '12%',
+				height : '32px',
+				float : 'left',
+				marginLeft : '-35px'
+			};
+			xfz.setStyle(userAvatarCell, userAvatarCellStyle);
+			var userAvatar = document.createElement('img');
+			var userAvatarStyle = {
+				width: '32px',
+				height : '32px',
+				fontSize: '12px',
+			};
+			xfz.setStyle(userAvatar, userAvatarStyle);
+			userAvatar.src = status.user.profile_image_url;
+			userAvatarCell.appendChild(userAvatar);
+			var content = document.createElement('div');
+			var contentStyle = {
+				width: '83%',
+				display : 'inline-block'
+			};
+			content.id = status.id;
+			xfz.setStyle(content, contentStyle);
+			var contentTop = document.createElement('a');
+			contentTop.innerHTML = status.user.name;
+			var contentTopStyle = {
+				display: 'block',
+				fontSize : '13px',
+			}
+			xfz.setStyle(contentTop, contentTopStyle);
+			var contentBottom = document.createElement('span');
+			var contentBottomStyle = {
+				display: 'block',
+				fontSize: '12px',
+			}
+			xfz.setStyle(contentBottom, contentBottomStyle);
+			contentBottom.innerHTML = status.text;
+			xfz.appendChilds(content, [contentTop, contentBottom]);
+			var controlPanel = document.createElement('span');
+			var controlPanelStyle = {
+				display: 'inline-block',
+				width: '5%',
+				height: '60px',
+				float: 'right',
+				marginRight : '20px'
+			}
+			var reply = document.createElement('a');
+			reply.innerHTML = 'R';
+			var replyStyle = {
+				position : 'absolute',
+				zIndex : '1',
+				right : '5px'
+			}
+			controlPanel.appendChild(reply);
+			xfz.setStyle(controlPanel, controlPanelStyle);
+			xfz.appendChilds(li, [userAvatarCell, content, controlPanel]);
+			var hr = document.createElement('hr');
+			var hrStyle = {
+				width : '360px',
+				marginLeft : '-40px',
+			}
+			xfz.setStyle(hr, hrStyle);
+			if(count == data.length - 1){
+				li.classList.add('last');
+			}
+			li.appendChild(hr);
+			ol.appendChild(li);
+			if(li == ol.firstChild){
+				li.classList.add('first');
+			}
+		}
+	},
 	setBody : function(){
 		switch(xfz.status.nav){
 			case 'timeline' : 
@@ -162,89 +247,8 @@ var xfz = {
 					else{
 						bodyContainer.innerHTML = '';
 						bodyContainer.appendChild(timeline);
-						for(count in data.data){
-							var status = data.data[count];
-							var li = document.createElement('li');
-							var liStyle = {
-								width : '320px',
-								minHeight : '60px',
-								listStyleType : 'none'
-							};
-							xfz.setStyle(li, liStyle);
-							var userAvatarCell = document.createElement('a');
-							var userAvatarCellStyle = {
-								display : 'inline-block',
-								width : '12%',
-								height : '32px',
-								float : 'left',
-								marginLeft : '-35px'
-							};
-							xfz.setStyle(userAvatarCell, userAvatarCellStyle);
-							var userAvatar = document.createElement('img');
-							var userAvatarStyle = {
-								width: '32px',
-								height : '32px',
-								fontSize: '12px',
-							};
-							xfz.setStyle(userAvatar, userAvatarStyle);
-							userAvatar.src = status.user.profile_image_url;
-							userAvatarCell.appendChild(userAvatar);
-							var content = document.createElement('div');
-							var contentStyle = {
-								width: '83%',
-								display : 'inline-block'
-							}
-							xfz.setStyle(content, contentStyle);
-							var contentTop = document.createElement('a');
-							contentTop.innerHTML = status.user.name;
-							var contentTopStyle = {
-								display: 'block',
-								fontSize : '13px',
-							}
-							xfz.setStyle(contentTop, contentTopStyle);
-							var contentBottom = document.createElement('span');
-							var contentBottomStyle = {
-								display: 'block',
-								fontSize: '12px',
-							}
-							xfz.setStyle(contentBottom, contentBottomStyle);
-							contentBottom.innerHTML = status.text;
-							xfz.appendChilds(content, [contentTop, contentBottom]);
-							var controlPanel = document.createElement('span');
-							var controlPanelStyle = {
-								display: 'inline-block',
-								width: '5%',
-								height: '60px',
-								float: 'right',
-								marginRight : '20px'
-							}
-							var reply = document.createElement('a');
-							reply.innerHTML = 'R';
-							var replyStyle = {
-								position : 'absolute',
-								zIndex : '1',
-								right : '5px'
-							}
-							controlPanel.appendChild(reply);
-							xfz.setStyle(controlPanel, controlPanelStyle);
-							xfz.appendChilds(li, [userAvatarCell, content, controlPanel]);
-							var hr = document.createElement('hr');
-							var hrStyle = {
-								width : '360px',
-								marginLeft : '-40px',
-							}
-							xfz.setStyle(hr, hrStyle);
-							if(count == 0){
-								li.classList.add('first');
-							}
-							if(count == data.data.length - 1){
-								if(!li.classList.contains('first')){
-									li.classList.add('last');
-								}
-							}
-							li.appendChild(hr);
-							ol.appendChild(li);
-						}
+						console.log(data.data);
+						xfz.setTimeline(ol, data.data);
 						if(data.data.length >= 10){
 							timeline.addEventListener('scroll', function(e){
 								var target = e.target;
@@ -252,6 +256,24 @@ var xfz = {
 								var height = target.scrollHeight;
 								var currHeight = target.clientHeight;
 								var gap = top / (height - currHeight) * 100;
+								if(gap >= 70 && !xfz.status.loadingContent){
+									xfz.status.loadingContent = true;
+									console.log('bottom');
+									var last = document.getElementsByClassName('last')[0];
+									var contentId = last.firstChild.nextSibling.id;
+									var loadingLi = document.createElement('li');
+									loadingLi.innerHTML = '载入中..';
+									last.parentNode.appendChild(loadingLi);
+									xfz.Post('/action/getTimelineBeforeLast', {contentId: contentId}, function(data){
+										if(data.success){
+											var parent = document.getElementsByClassName('last')[0].parentNode;
+											parent.removeChild(parent.lastChild);
+											document.getElementsByClassName('last')[0].classList.remove('last');
+											xfz.setTimeline(parent, data.data);
+											xfz.status.loadingContent = false;
+										}
+									});
+								}
 								console.log(gap);
 
 							}, false);

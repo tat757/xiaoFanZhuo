@@ -69,20 +69,26 @@ FanfouAPI.prototype.getCurrUserHomeTimeline = function(err, res){
 	var path = '/statuses/home_timeline.json?count=10';
 	var url = this.apiBaseURL + path;
 	this.getRequest(url, err, res);
-}
+};
 
 FanfouAPI.prototype.getCurrUser = function(err, res){
 	var path = '/users/show.json';
 	var url = this.apiBaseURL + path;
 	this.getRequest(url, err, res);
-}
+};
 
 FanfouAPI.prototype.postStatus = function(data, err, res){
 	var path = '/statuses/update.json';
 	var data = {"status": data.text };
 	var url = this.apiBaseURL + path;
 	this.postRequest(url, data, err, res);
-}
+};
+
+FanfouAPI.prototype.getTimelineBeforeLast = function(lastId, err, res){
+	var path = '/statuses/home_timeline.json?count=10&max_id=' + lastId;
+	var url = this.apiBaseURL + path;
+	this.getRequest(url, err, res);
+};
 
 FanfouAPI.prototype.getRequest = function(url, err, res){
 	console.log(this.access_token);
