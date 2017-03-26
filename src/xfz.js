@@ -115,85 +115,96 @@ var xfz = {
 
 		return inputContainer;
 	},
-	setTimeline : function(ol, data){
+	setTimeline : function(data, hidden){
+		var ol = document.getElementById('ol');
+		var status, li, userAvatarCell, userAvatar, content;
+		var contentTop, contentBottom, controlPanel, reply, hr;
+		var liStyle = {
+			width : '320px',
+			minHeight : '60px',
+			listStyleType : 'none'
+		};
+		var userAvatarCellStyle = {
+			display : 'inline-block',
+			width : '12%',
+			height : '32px',
+			float : 'left',
+			marginLeft : '-35px'
+		};
+		var userAvatarStyle = {
+			width: '32px',
+			height : '32px',
+			fontSize: '12px',
+		};
+		var contentStyle = {
+			width: '83%',
+			display : 'inline-block'
+		};
+		var contentTopStyle = {
+			display: 'block',
+			fontSize : '13px',
+		};
+		var contentBottomStyle = {
+			display: 'block',
+			fontSize: '12px',
+		};
+		var controlPanelStyle = {
+			display: 'inline-block',
+			width: '5%',
+			height: '60px',
+			float: 'right',
+			marginRight : '20px'
+		};
+		var replyStyle = {
+			position : 'absolute',
+			zIndex : '1',
+			right : '5px'
+		};
+		var hrStyle = {
+			width : '360px',
+			marginLeft : '-40px',
+		};
 		for(count in data){
-			var status = data[count];
-			var li = document.createElement('li');
-			var liStyle = {
-				width : '320px',
-				minHeight : '60px',
-				listStyleType : 'none'
-			};
+			status = data[count];
+			li = document.createElement('li');
 			xfz.setStyle(li, liStyle);
-			var userAvatarCell = document.createElement('a');
-			var userAvatarCellStyle = {
-				display : 'inline-block',
-				width : '12%',
-				height : '32px',
-				float : 'left',
-				marginLeft : '-35px'
-			};
+			userAvatarCell = document.createElement('a');
 			xfz.setStyle(userAvatarCell, userAvatarCellStyle);
-			var userAvatar = document.createElement('img');
-			var userAvatarStyle = {
-				width: '32px',
-				height : '32px',
-				fontSize: '12px',
-			};
+			userAvatar = document.createElement('img');
 			xfz.setStyle(userAvatar, userAvatarStyle);
 			userAvatar.src = status.user.profile_image_url;
 			userAvatarCell.appendChild(userAvatar);
-			var content = document.createElement('div');
-			var contentStyle = {
-				width: '83%',
-				display : 'inline-block'
-			};
+			content = document.createElement('div');
 			content.id = status.id;
 			xfz.setStyle(content, contentStyle);
-			var contentTop = document.createElement('a');
+			contentTop = document.createElement('a');
 			contentTop.innerHTML = status.user.name;
-			var contentTopStyle = {
-				display: 'block',
-				fontSize : '13px',
-			}
 			xfz.setStyle(contentTop, contentTopStyle);
-			var contentBottom = document.createElement('span');
-			var contentBottomStyle = {
-				display: 'block',
-				fontSize: '12px',
-			}
+			contentBottom = document.createElement('span');
 			xfz.setStyle(contentBottom, contentBottomStyle);
 			contentBottom.innerHTML = status.text;
 			xfz.appendChilds(content, [contentTop, contentBottom]);
-			var controlPanel = document.createElement('span');
-			var controlPanelStyle = {
-				display: 'inline-block',
-				width: '5%',
-				height: '60px',
-				float: 'right',
-				marginRight : '20px'
-			}
-			var reply = document.createElement('a');
+			controlPanel = document.createElement('span');
+			reply = document.createElement('a');
 			reply.innerHTML = 'R';
-			var replyStyle = {
-				position : 'absolute',
-				zIndex : '1',
-				right : '5px'
-			}
 			controlPanel.appendChild(reply);
 			xfz.setStyle(controlPanel, controlPanelStyle);
 			xfz.appendChilds(li, [userAvatarCell, content, controlPanel]);
-			var hr = document.createElement('hr');
-			var hrStyle = {
-				width : '360px',
-				marginLeft : '-40px',
-			}
+			hr = document.createElement('hr');
 			xfz.setStyle(hr, hrStyle);
-			if(count == data.length - 1){
-				li.classList.add('last');
-			}
 			li.appendChild(hr);
-			ol.appendChild(li);
+			if(hidden){
+				li.style.display = 'none';
+				ol.insertBefore(li, document.getElementsByClassName('first')[0]);
+				document.getElementsByClassName('first')[0].classList.remove('first');
+				li.classList.add('unread');
+			}
+			else{
+				ol.appendChild(li);
+				if(count == data.length - 1){
+					li.classList.add('last');
+				}
+			}
 			if(li == ol.firstChild){
 				li.classList.add('first');
 			}
@@ -215,6 +226,41 @@ var xfz = {
 				break;
 		}
 	},
+	checkNewTimeline : function(){
+		var first = document.getElementsByClassName('first')[0].childNodes[1];
+		var notification;
+		xfz.Post('/action/checkNewTimeline', {firstId: first.id}, function(data){
+			if(data.success){
+				if(data.data.length > 0){
+					notification = document.getElementById('timelineNotification');
+					if(notification.innerHTML !== ''){
+						notification.firstChild.innerHTML = data.data.length + +notification.firstChild.innerHTML;
+					}
+					else{
+						var button = document.createElement('button');
+						var buttonStyle = {
+							width : '100%',
+							height : '20px',
+							textAlign : 'center'
+						}
+						button.innerHTML = data.data.length;
+						xfz.setStyle(button, buttonStyle);
+						notification.appendChild(button);
+						button.addEventListener('click', function(e){
+							var i = 0;
+							var unread = document.getElementsByClassName('unread');
+							document.getElementById('timelineNotification').innerHTML = '';
+							for(i = 0; i <= unread.length; i++){
+								unread[count].style.display = 'block';
+								unread[count].classList.remove('unread');
+							}
+						}, false);
+					}
+					xfz.setTimeline(data.data, true);
+				}
+			}
+		});
+	},
 	body : {
 		timeline : function(){
 			document.getElementById('bodyContainer').innerHTML = '载入中..';
@@ -234,6 +280,7 @@ var xfz = {
 				var timelineStream = document.createElement('div');
 				timelineStream.id = 'timelineStream';
 				var ol = document.createElement('ol');
+				ol.id = 'ol';
 				timelineStream.appendChild(ol);
 
 				xfz.appendChilds(timeline, [timelineNotification, timelineStream]);
@@ -242,13 +289,12 @@ var xfz = {
 						var li = document.createElement('li');
 						li.style.listStyleType = 'none';
 						li.innerHTML = '没有信息哦.';
-						ol.appendChild(li);
+						document.getElementById('ol').appendChild(li);
 					}
 					else{
 						bodyContainer.innerHTML = '';
 						bodyContainer.appendChild(timeline);
-						console.log(data.data);
-						xfz.setTimeline(ol, data.data);
+						xfz.setTimeline(data.data);
 						if(data.data.length >= 10){
 							timeline.addEventListener('scroll', function(e){
 								var target = e.target;
@@ -264,12 +310,12 @@ var xfz = {
 									var loadingLi = document.createElement('li');
 									loadingLi.innerHTML = '载入中..';
 									last.parentNode.appendChild(loadingLi);
-									xfz.Post('/action/getTimelineBeforeLast', {contentId: contentId}, function(data){
+									xfz.Post('/action/getHomeTimelineBeforeLast', {contentId: contentId}, function(data){
+										var parent = document.getElementById('ol');
 										if(data.success){
-											var parent = document.getElementsByClassName('last')[0].parentNode;
 											parent.removeChild(parent.lastChild);
 											document.getElementsByClassName('last')[0].classList.remove('last');
-											xfz.setTimeline(parent, data.data);
+											xfz.setTimeline(data.data);
 											xfz.status.loadingContent = false;
 										}
 									});
@@ -278,6 +324,9 @@ var xfz = {
 
 							}, false);
 						}
+						setInterval(function(){
+							xfz.checkNewTimeline();
+						}, 10 * 1000);
 					}
 				});
 			}

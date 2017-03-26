@@ -84,8 +84,14 @@ FanfouAPI.prototype.postStatus = function(data, err, res){
 	this.postRequest(url, data, err, res);
 };
 
-FanfouAPI.prototype.getTimelineBeforeLast = function(lastId, err, res){
+FanfouAPI.prototype.getHomeTimelineBeforeLast = function(lastId, err, res){
 	var path = '/statuses/home_timeline.json?count=10&max_id=' + lastId;
+	var url = this.apiBaseURL + path;
+	this.getRequest(url, err, res);
+};
+
+FanfouAPI.prototype.checkNewTimeline = function(firstId, err, res){
+	var path = '/statuses/home_timeline.json?since_id=' + firstId;
 	var url = this.apiBaseURL + path;
 	this.getRequest(url, err, res);
 };

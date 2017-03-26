@@ -1,3 +1,7 @@
+0.5.2
+-添加时间轴更新检测功能 | Added timeline updates checking feature
+-添加信息到readme文件	 | Added information to readme file
+
 0.5.1 
 -添加载入旧信息功能 | Added loading old posts feature
 
