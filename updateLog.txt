@@ -1,3 +1,6 @@
+0.5.3
+-修复新用户无法正常使用的问题 | Fixed several bugs related to new user.
+
 0.5.2
 -添加时间轴更新检测功能 | Added timeline updates checking feature
 -添加信息到readme文件	 | Added information to readme file

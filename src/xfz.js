@@ -350,8 +350,13 @@ var xfz = {
 			}
 			xfz.setStyle(container, containerStyle);
 			xfz.Get('/action/authorize', function(data){
-				xfz.status.page = 'main';
-				xfz.setPage();
+				if(!data.success){
+					window.location = data.url;
+				}
+				else{
+					xfz.status.page = 'main';
+					xfz.setPage();
+				}
 			});
 		},
 		logout : function(){
@@ -400,9 +405,9 @@ var xfz = {
 					container.innerHTML = '';
 					xfz.appendChilds(div, [inputContainer, navBarContainer, bodyContainer]);
 					container.appendChild(div);
-					xfz.Get('/action/getCurrAvatar', function(img){
-						document.getElementById('currUserAvatar').src = 'data:image/jpeg;base64,' + img.data.image;
-					});
+
+					console.log(xfz.status.currUser);
+					document.getElementById('currUserAvatar').src = xfz.status.currUser.profile_image_url;
 					xfz.status.nav = 'timeline';
 					xfz.status.notCurrUser = false;
 					xfz.setBody();

@@ -9,16 +9,20 @@ var config = new Config();
 
 router.get('/authorize', function(req, res){
 	if(config.get('access_token')){
+		console.log('Using saved access_token');
 		fanfou.access_token = config.get('access_token');
 		fanfou.access_token_secret = config.get('access_token_secret');
 		return res.json({success: true});
 	}
 	else{
+		console.log('Send request for access_token');
 		fanfou.getOAuthRequestToken(function(oauth){
+			console.log('Token set.');
 			var redirectUrl = fanfou.authorizeURL + '?oauth_token=' + oauth.token + '&oauth_callback=http://127.0.0.1:3000/action/authorize/callback';
 			fanfou.token = oauth.token;
 			fanfou.token_secret = oauth.token_secret;
-			return res.json({success: true, url: redirectUrl});
+
+			return res.json({success: false, url: redirectUrl});
 		});
 	}
 });
@@ -43,50 +47,6 @@ router.get('/getCurrUser', function(req, res){
 			//console.log(data);
 			fanfou.userId = data.unique_id;
 			fanfou.avatar = data.profile_image_url;
-			data.appPath = app.getPath('appData');
-			//console.log(data.appPath);
-			var saveAvatar = function(callback){
-				fs.access(app.getPath('appData') + '/xiaoFanZhuo/' + fanfou.userId + '/avatar/' + fanfou.userId + '.jpg', function(err){
-					if(err){
-						var image = fs.createWriteStream(app.getPath('appData') + '/xiaoFanZhuo/' + fanfou.userId + '/avatar/' + fanfou.userId + '.jpg');
-						http.get(data.profile_image_url, function(response){
-							response.pipe(image);
-							callback(null);
-						});
-					}
-					callback(null);
-				});
-			};
-			var checkAvatarFolder = function(callback){
-				fs.access(app.getPath('appData') + '/xiaoFanZhuo/' + fanfou.userId + '/avatar', function(err){
-					if(err){
-						fs.mkdir(app.getPath('appData') + '/xiaoFanZhuo/' + fanfou.userId + '/avatar', 0777, function(error){
-							callback(null);
-						});
-					}
-					else{
-						callback(null);
-					}
-				});
-			};
-			var checkUserFolder = function(callback){
-				fs.access(app.getPath('appData') + '/xiaoFanZhuo/' + fanfou.userId, function(err){
-					if(err){
-						fs.mkdir(app.getPath('appData') + '/xiaoFanZhuo/' + fanfou.userId, 0777, function(error){
-							callback(null);
-						});
-					}
-					else{
-						callback(null);
-					}
-				});
-			}
-			checkUserFolder(function(err){
-				checkAvatarFolder(function(err){
-					saveAvatar(function(err){
-					});
-				});
-			});
 			return res.json({success: true, data: data});
 		});
 });
