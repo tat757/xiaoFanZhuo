@@ -164,6 +164,7 @@ var xfz = {
 			width : '360px',
 			marginLeft : '-40px',
 		};
+		console.log(data[0]);
 		for(count in data){
 			status = data[count];
 			li = document.createElement('li');
@@ -187,6 +188,13 @@ var xfz = {
 			controlPanel = document.createElement('span');
 			reply = document.createElement('a');
 			reply.innerHTML = 'R';
+			reply.dataset.replyTo = status.user.name;
+			reply.addEventListener('click', function(e){
+				var inputArea = document.getElementById('inputArea');
+				inputArea.focus();
+				inputArea.value = '@' + e.target.dataset.replyTo + ' ';
+
+			}, false);
 			controlPanel.appendChild(reply);
 			xfz.setStyle(controlPanel, controlPanelStyle);
 			xfz.appendChilds(li, [userAvatarCell, content, controlPanel]);

@@ -1,3 +1,6 @@
+0.5.4
+-添加回复功能的部分代码 | Added more code for reply feature
+
 0.5.3
 -修复新用户无法正常使用的问题 | Fixed several bugs related to new user.
 
