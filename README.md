@@ -7,8 +7,9 @@
 * 登出 Logout
 
 2. 发布 Posting
-* 发布文字信息 Posting text
-* 回复信息 Reply
+* 发布文字信息 Posting message
+* 回复信息 Reply message
+* 删除信息 Destroy message
 
 3. 时间轴 Timeline
 * 载入时获取主页时间轴 Pulling home timeline when loading
