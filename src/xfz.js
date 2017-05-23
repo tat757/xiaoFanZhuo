@@ -206,37 +206,59 @@ var xfz = {
 			contentBottom.innerHTML = status.text;
 			xfz.appendChilds(content, [contentTop, contentBottom]);
 			controlPanel = document.createElement('span');
-			reply = document.createElement('a');
-			reply.innerHTML = 'R';
-			reply.dataset.replyToName = status.user.name;
-			reply.dataset.replyToId = status.user.id;
-			reply.dataset.replyId = status.id;
-			reply.addEventListener('click', function(e){
-				var inputArea = document.getElementById('inputArea');
-				var atUserList = [];
-				var char;
-				inputArea.focus();
-				inputArea.dataset.replyId = e.target.dataset.replyId;
-				inputArea.dataset.replyToId = e.target.dataset.replyToId;
-				inputArea.dataset.replyToName = e.target.dataset.replyToName;
-				inputArea.dataset.isReply = true;
-				var text = document.getElementById(e.target.dataset.replyId).lastChild.innerHTML;
-				console.log(text);
-				var textArray = text.split(' ');
-				console.log(textArray);
-				//找到原消息中所有被@的用户
-				for(var i = 0; i < textArray.length; i++){
-					char = textArray[i].split('');
-					if(char[0] === '@'){
-						atUserList.push(textArray[i]);
+			if(status.is_self == false || status.is_self == 'false'){
+				reply = document.createElement('a');
+				reply.innerHTML = 'R';
+				reply.dataset.replyToName = status.user.name;
+				reply.dataset.replyToId = status.user.id;
+				reply.dataset.replyId = status.id;
+				reply.addEventListener('click', function(e){
+					var inputArea = document.getElementById('inputArea');
+					var atUserList = [];
+					var char;
+					inputArea.focus();
+					inputArea.dataset.replyId = e.target.dataset.replyId;
+					inputArea.dataset.replyToId = e.target.dataset.replyToId;
+					inputArea.dataset.replyToName = e.target.dataset.replyToName;
+					inputArea.dataset.isReply = true;
+					var text = document.getElementById(e.target.dataset.replyId).lastChild.innerHTML;
+					console.log(text);
+					var textArray = text.split(' ');
+					console.log(textArray);
+					//找到原消息中所有被@的用户
+					for(var i = 0; i < textArray.length; i++){
+						char = textArray[i].split('');
+						if(char[0] === '@'){
+							atUserList.push(textArray[i]);
+						}
 					}
-				}
-				inputArea.value = '@' + e.target.dataset.replyToName + ' ';
-				for(var i = 0; i < atUserList.length; i++){
-					inputArea.value += atUserList + ' ';
-				}
-			}, false);
-			controlPanel.appendChild(reply);
+					inputArea.value = '@' + e.target.dataset.replyToName + ' ';
+					for(var i = 0; i < atUserList.length; i++){
+						inputArea.value += atUserList + ' ';
+					}
+				}, false);
+
+				controlPanel.appendChild(reply);
+			}
+			else{
+				destroy = document.createElement('a');
+				//当发布信息的用户是自己的话,回复键改为删除键
+				destroy.innerHTML = 'D';
+				destroy.dataset.msgId = status.id;
+				destroy.addEventListener('click', function(e){
+					xfz.Post('/action/destroyStatus', {msgId : e.target.dataset.msgId}, function(data){
+						if(data.success == true){
+							var last
+							var element = document.getElementById(e.target.dataset.msgId).parentElement;
+							if(element.classList.contains('first')){
+								element.parentElement.firstChild.nextSibling.classList.add('first');
+							}
+							element.outerHTML = '';
+						}
+					});
+				}, false);
+				controlPanel.appendChild(destroy);
+			}
 			xfz.setStyle(controlPanel, controlPanelStyle);
 			xfz.appendChilds(li, [userAvatarCell, content, controlPanel]);
 			hr = document.createElement('hr');

@@ -103,6 +103,24 @@ FanfouAPI.prototype.postStatus = function(data, err, res){
 	this.postRequest(url, parameter, err, res);
 };
 
+FanfouAPI.prototype.destroyStatus = function(data, err, res){
+	var path = '/statuses/destroy.json';
+	var parameter;
+	console.log('******************************************');
+	console.log('******************************************');
+	console.log('******************************************');
+	console.log('******************************************');
+	console.log(data);
+	console.log('******************************************');
+	console.log('******************************************');
+	console.log('******************************************');
+	console.log('******************************************');
+	console.log('******************************************');
+	parameter = {"id": data.msgId };
+	var url = this.apiBaseURL + path;
+	console.log(parameter);
+	this.postRequest(url, parameter, err, res);
+};
 
 FanfouAPI.prototype.getHomeTimelineBeforeLast = function(lastId, err, res){
 	var path = '/statuses/home_timeline.json?count=10&max_id=' + lastId;

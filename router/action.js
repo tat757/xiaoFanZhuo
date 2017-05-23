@@ -111,6 +111,31 @@ router.post('/postStatus', function(req, res){
 		});
 });
 
+router.post('/destroyStatus', function(req, res){
+	if(req.body.msgId == undefined){
+		return res.json({success: false});
+	}
+	else{
+		var data = req.body;
+		fanfou.access_token = config.get('access_token');
+		fanfou.access_token_secret = config.get('access_token_secret');
+		console.log('data : ================================================');
+		console.log(data);
+		console.log('==============================');
+		fanfou.destroyStatus(
+			data,
+			function(error, result, body){
+				console.log(result);
+				console.log(body);
+			},
+			function(data){
+				data = JSON.parse(data);
+				return res.json({success: true});
+			});
+
+	}
+});
+
 router.post('/getHomeTimelineBeforeLast', function(req, res){
 	console.log('/getHomeTimelineBeforeLast');
 	var id = req.body.contentId;
