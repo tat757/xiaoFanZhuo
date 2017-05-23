@@ -1,3 +1,6 @@
+0.5.5
+-添加回复功能 | Added reply feature
+
 0.5.4
 -添加回复功能的部分代码 | Added more code for reply feature
 

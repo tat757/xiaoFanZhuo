@@ -83,11 +83,24 @@ router.get('/logout', function(req, res){
 
 router.post('/postStatus', function(req, res){
 	console.log(req.body);
-	var text = req.body.text;
+	var data = {};
+	console.log(req.body.isReply);
+	if(req.body.isReply == true || req.body.isReply == 'true'){
+		data.isReply = true;
+		data.replyId = req.body.replyId;
+		data.replyToId = req.body.replyToId;
+		data.text = req.body.text;
+	}
+	else{
+		data.text = req.body.text;
+	}
 	fanfou.access_token = config.get('access_token');
 	fanfou.access_token_secret = config.get('access_token_secret');
+	console.log('data : ================================================');
+	console.log(data);
+	console.log('==============================');
 	fanfou.postStatus(
-		{text: text},
+		data,
 		function(error, result, body){
 			console.log(result);
 			console.log(body);

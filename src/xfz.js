@@ -106,7 +106,26 @@ var xfz = {
 
 		postBt.addEventListener('click', function(e){
 			var target = e.target;
-			xfz.Post('/action/postStatus', {text: document.getElementById('inputArea').value}, function(data){
+			var inputArea = document.getElementById('inputArea');
+			var parameter = {};
+			var textArray = inputArea.value.split(' ');
+			var char;
+			for(var i = 0; i < textArray.length; i++){
+				char = textArray[i].split('');
+				if(char[0] === '@'){
+					console.log('textArray :' + textArray[i]);
+					console.log('inputArea.dataset :');
+					console.log(inputArea.dataset);
+					if(textArray[i] === '@' + inputArea.dataset.replyToName){
+						parameter = inputArea.dataset;
+						parameter.isReply = true;
+					}
+				}
+			}
+			parameter.text = inputArea.value;
+			console.log(parameter);
+
+			xfz.Post('/action/postStatus', parameter, function(data){
 				document.getElementById('inputArea').value = 'sent';
 			});
 		}, false);
@@ -165,6 +184,7 @@ var xfz = {
 			marginLeft : '-40px',
 		};
 		console.log(data[0]);
+		console.log(data[1]);
 		for(count in data){
 			status = data[count];
 			li = document.createElement('li');
@@ -188,12 +208,33 @@ var xfz = {
 			controlPanel = document.createElement('span');
 			reply = document.createElement('a');
 			reply.innerHTML = 'R';
-			reply.dataset.replyTo = status.user.name;
+			reply.dataset.replyToName = status.user.name;
+			reply.dataset.replyToId = status.user.id;
+			reply.dataset.replyId = status.id;
 			reply.addEventListener('click', function(e){
 				var inputArea = document.getElementById('inputArea');
+				var atUserList = [];
+				var char;
 				inputArea.focus();
-				inputArea.value = '@' + e.target.dataset.replyTo + ' ';
-
+				inputArea.dataset.replyId = e.target.dataset.replyId;
+				inputArea.dataset.replyToId = e.target.dataset.replyToId;
+				inputArea.dataset.replyToName = e.target.dataset.replyToName;
+				inputArea.dataset.isReply = true;
+				var text = document.getElementById(e.target.dataset.replyId).lastChild.innerHTML;
+				console.log(text);
+				var textArray = text.split(' ');
+				console.log(textArray);
+				//找到原消息中所有被@的用户
+				for(var i = 0; i < textArray.length; i++){
+					char = textArray[i].split('');
+					if(char[0] === '@'){
+						atUserList.push(textArray[i]);
+					}
+				}
+				inputArea.value = '@' + e.target.dataset.replyToName + ' ';
+				for(var i = 0; i < atUserList.length; i++){
+					inputArea.value += atUserList + ' ';
+				}
 			}, false);
 			controlPanel.appendChild(reply);
 			xfz.setStyle(controlPanel, controlPanelStyle);
