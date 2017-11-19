@@ -105,10 +105,19 @@ var xfz = {
 			}, false);
 
 		postBt.addEventListener('click', function(e){
-			var target = e.target;
-			xfz.Post('/action/postStatus', {text: document.getElementById('inputArea').value}, function(data){
-				document.getElementById('inputArea').value = 'sent';
-			});
+			var input = document.getElementById('inputArea');
+			var postData = {};
+			if(input.value){
+				postData.text = input.value;
+				if(input.dataset.reply){
+					postData.reply = true;
+					postData.in_reply_to_user_id = input.dataset.in_reply_to_user_id;
+					postData.repost_status_id = input.dataset.repost_status_id;
+				}
+				xfz.Post('/action/postStatus', postData, function(data){
+					document.getElementById('inputArea').value = 'sent';
+				});
+			}
 		}, false);
 
 		xfz.appendChilds(inputContainer, [currUserAvatar, inputArea, postBt, logoutBt]);
@@ -117,7 +126,7 @@ var xfz = {
 	},
 	setTimeline : function(data, hidden){
 		var ol = document.getElementById('ol');
-		var status, li, userAvatarCell, userAvatar, content;
+		var status, li, userAvatarCell, userAvatar, content, count;
 		var contentTop, contentBottom, controlPanel, reply, hr;
 		var liStyle = {
 			width : '320px',
