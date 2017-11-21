@@ -105,40 +105,56 @@ var xfz = {
 			}, false);
 
 		postBt.addEventListener('click', function(e){
-			var input = document.getElementById('inputArea');
-			var postData = {};
-			if(input.value){
-				postData.text = input.value;
-				if(input.dataset.reply){
-					postData.reply = true;
-					postData.in_reply_to_user_id = input.dataset.in_reply_to_user_id;
-					postData.repost_status_id = input.dataset.repost_status_id;
+			var target = e.target;
+			var inputArea = document.getElementById('inputArea');
+			var parameter = {};
+			var textArray = inputArea.value.split(' ');
+			var char;
+			for(var i = 0; i < textArray.length; i++){
+				char = textArray[i].split('');
+				if(char[0] === '@'){
+					console.log('textArray :' + textArray[i]);
+					console.log('inputArea.dataset :');
+					console.log(inputArea.dataset);
+					if(textArray[i] === '@' + inputArea.dataset.replyToName){
+						parameter = inputArea.dataset;
+						parameter.isReply = true;
+					}
 				}
-				xfz.Post('/action/postStatus', postData, function(data){
-					document.getElementById('inputArea').value = 'sent';
-				});
 			}
+			parameter.text = inputArea.value;
+			console.log(parameter);
+
+			xfz.Post('/action/postStatus', parameter, function(data){
+				document.getElementById('inputArea').value = 'sent';
+			});
 		}, false);
 
 		xfz.appendChilds(inputContainer, [currUserAvatar, inputArea, postBt, logoutBt]);
 
 		return inputContainer;
 	},
+	/*
+	 *Setup the timeline
+	 */
 	setTimeline : function(data, hidden){
 		var ol = document.getElementById('ol');
 		var status, li, userAvatarCell, userAvatar, content, count;
 		var contentTop, contentBottom, controlPanel, reply, hr;
 		var liStyle = {
-			width : '320px',
+			width : '340px',
 			minHeight : '60px',
-			listStyleType : 'none'
+			listStyleType : 'none',
+			paddingLeft: '2px',
+			paddingTop: '2px',
+			paddingRight: '2px',
+			marginTop: '-3px'
 		};
 		var userAvatarCellStyle = {
 			display : 'inline-block',
 			width : '12%',
 			height : '32px',
-			float : 'left',
-			marginLeft : '-35px'
+			float : 'left'
 		};
 		var userAvatarStyle = {
 			width: '32px',
@@ -162,7 +178,7 @@ var xfz = {
 			width: '5%',
 			height: '60px',
 			float: 'right',
-			marginRight : '20px'
+			//marginRight : '20px'
 		};
 		var replyStyle = {
 			position : 'absolute',
@@ -171,8 +187,15 @@ var xfz = {
 		};
 		var hrStyle = {
 			width : '360px',
-			marginLeft : '-40px',
+			marginTop : '2px',
+			marginBottom : '2px',
+			marginLeft : '0px',
+			marginRight : '0px'
 		};
+		console.log(data[0]);
+		console.log(data[1]);
+		ol.style.paddingLeft = '0';
+		//for each data create a message block
 		for(count in data){
 			status = data[count];
 			li = document.createElement('li');
@@ -194,13 +217,73 @@ var xfz = {
 			contentBottom.innerHTML = status.text;
 			xfz.appendChilds(content, [contentTop, contentBottom]);
 			controlPanel = document.createElement('span');
-			reply = document.createElement('a');
-			reply.innerHTML = 'R';
-			controlPanel.appendChild(reply);
+			if(status.is_self == false || status.is_self == 'false'){
+				reply = document.createElement('a');
+				reply.innerHTML = 'R';
+				reply.dataset.replyToName = status.user.name;
+				reply.dataset.replyToId = status.user.id;
+				reply.dataset.replyId = status.id;
+				reply.addEventListener('click', function(e){
+					var inputArea = document.getElementById('inputArea');
+					var atUserList = [];
+					var char;
+					inputArea.focus();
+					inputArea.dataset.replyId = e.target.dataset.replyId;
+					inputArea.dataset.replyToId = e.target.dataset.replyToId;
+					inputArea.dataset.replyToName = e.target.dataset.replyToName;
+					inputArea.dataset.isReply = true;
+					var text = document.getElementById(e.target.dataset.replyId).lastChild.innerHTML;
+					console.log(text);
+					var textArray = text.split(' ');
+					console.log(textArray);
+					//找到原消息中所有被@的用户
+					for(var i = 0; i < textArray.length; i++){
+						char = textArray[i].split('');
+						if(char[0] === '@'){
+							atUserList.push(textArray[i]);
+						}
+					}
+					inputArea.value = '@' + e.target.dataset.replyToName + ' ';
+					for(var i = 0; i < atUserList.length; i++){
+						inputArea.value += atUserList + ' ';
+					}
+				}, false);
+
+				controlPanel.appendChild(reply);
+			}
+			else{
+				destroy = document.createElement('a');
+				//当发布信息的用户是自己的话,回复键改为删除键
+				destroy.innerHTML = 'D';
+				destroy.dataset.msgId = status.id;
+				destroy.addEventListener('click', function(e){
+					xfz.Post('/action/destroyStatus', {msgId : e.target.dataset.msgId}, function(data){
+						if(data.success == true){
+							var last
+							var element = document.getElementById(e.target.dataset.msgId).parentElement;
+							if(element.classList.contains('first')){
+								element.parentElement.firstChild.nextSibling.classList.add('first');
+							}
+							element.outerHTML = '';
+						}
+					});
+				}, false);
+				controlPanel.appendChild(destroy);
+			}
 			xfz.setStyle(controlPanel, controlPanelStyle);
 			xfz.appendChilds(li, [userAvatarCell, content, controlPanel]);
 			hr = document.createElement('hr');
 			xfz.setStyle(hr, hrStyle);
+			li.addEventListener('mouseover', function(e){
+				console.log(e);
+				if (e.target.localName === 'li'){
+					e.target.style.setProperty('background-color','#5EA8C9','important');
+				}
+			});
+			li.addEventListener('mouseleave', function(e){
+				console.log(e);
+				e.target.style.setProperty('background-color','white','important');
+			});
 			li.appendChild(hr);
 			if(hidden){
 				li.style.display = 'none';
@@ -235,6 +318,9 @@ var xfz = {
 				break;
 		}
 	},
+	/*
+	* get new timeline based on the last message id
+	*/
 	checkNewTimeline : function(){
 		var first = document.getElementsByClassName('first')[0].childNodes[1];
 		var notification;
@@ -242,6 +328,7 @@ var xfz = {
 			if(data.success){
 				if(data.data.length > 0){
 					notification = document.getElementById('timelineNotification');
+					// if the notification already here, plus new number to it
 					if(notification.innerHTML !== ''){
 						notification.firstChild.innerHTML = data.data.length + +notification.firstChild.innerHTML;
 					}
@@ -359,8 +446,13 @@ var xfz = {
 			}
 			xfz.setStyle(container, containerStyle);
 			xfz.Get('/action/authorize', function(data){
-				xfz.status.page = 'main';
-				xfz.setPage();
+				if(!data.success){
+					window.location = data.url;
+				}
+				else{
+					xfz.status.page = 'main';
+					xfz.setPage();
+				}
 			});
 		},
 		logout : function(){
@@ -409,9 +501,9 @@ var xfz = {
 					container.innerHTML = '';
 					xfz.appendChilds(div, [inputContainer, navBarContainer, bodyContainer]);
 					container.appendChild(div);
-					xfz.Get('/action/getCurrAvatar', function(img){
-						document.getElementById('currUserAvatar').src = 'data:image/jpeg;base64,' + img.data.image;
-					});
+
+					console.log(xfz.status.currUser);
+					document.getElementById('currUserAvatar').src = xfz.status.currUser.profile_image_url;
 					xfz.status.nav = 'timeline';
 					xfz.status.notCurrUser = false;
 					xfz.setBody();

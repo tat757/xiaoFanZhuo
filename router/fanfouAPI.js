@@ -79,9 +79,47 @@ FanfouAPI.prototype.getCurrUser = function(err, res){
 
 FanfouAPI.prototype.postStatus = function(data, err, res){
 	var path = '/statuses/update.json';
-	var data = {"status": data.text };
+	var parameter;
+	console.log('******************************************');
+	console.log('******************************************');
+	console.log('******************************************');
+	console.log('******************************************');
+	console.log(data);
+	console.log('******************************************');
+	console.log('******************************************');
+	console.log('******************************************');
+	console.log('******************************************');
+	console.log('******************************************');
+	if(data.isReply == true){
+		parameter = {"status" : data.text,
+					 "in_reply_to_status_id" : data.replyId,
+					 "in_reply_to_user_id" : data.replyToId};
+	}
+	else{
+		parameter = {"status": data.text };
+	}
 	var url = this.apiBaseURL + path;
-	this.postRequest(url, data, err, res);
+	console.log(parameter);
+	this.postRequest(url, parameter, err, res);
+};
+
+FanfouAPI.prototype.destroyStatus = function(data, err, res){
+	var path = '/statuses/destroy.json';
+	var parameter;
+	console.log('******************************************');
+	console.log('******************************************');
+	console.log('******************************************');
+	console.log('******************************************');
+	console.log(data);
+	console.log('******************************************');
+	console.log('******************************************');
+	console.log('******************************************');
+	console.log('******************************************');
+	console.log('******************************************');
+	parameter = {"id": data.msgId };
+	var url = this.apiBaseURL + path;
+	console.log(parameter);
+	this.postRequest(url, parameter, err, res);
 };
 
 FanfouAPI.prototype.getHomeTimelineBeforeLast = function(lastId, err, res){
