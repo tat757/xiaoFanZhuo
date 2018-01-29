@@ -1,10 +1,13 @@
 var container = document.getElementById('container');
 var httpRequest = new XMLHttpRequest();
-var xfz = {
+var XFZ = {
 	status : {
 		page : 'welcome',
 		currUser : {
 			unique_id : ''
+		},
+		input: {
+			message: ''
 		},
 		nav : 'home',
 		notMain : false,
@@ -12,8 +15,8 @@ var xfz = {
 	},
 	init : function(){
 		document.body.style.overflowY = 'hidden';
-		xfz.status.page = 'welcome';
-		xfz.setPage();
+		XFZ.status.page = 'welcome';
+		XFZ.setPage();
 	},
 	Get : function(url, callback){
 		httpRequest = new XMLHttpRequest();
@@ -44,66 +47,59 @@ var xfz = {
 		httpRequest.send(data);
 	},
 	setPage : function(){
-		switch(xfz.status.page){
+		switch(XFZ.status.page){
 			case 'welcome' : 
-				xfz.page.welcome();
+				XFZ.page.welcome();
 				break;
 			case 'login' :
-				xfz.page.login();
+				XFZ.page.login();
 				break;
 			case 'logout' :
-				xfz.page.logout();
+				XFZ.page.logout();
 				break;
 			case 'main' :
-				xfz.page.main();
+				XFZ.page.main();
 				break;
 		}
 	},
 	setInput : function(){
 		var inputContainer = document.createElement('div');
-		var inputArea = document.createElement('textarea');
-		var postBt = document.createElement('button');
-		var logoutBt = document.createElement('button');
-		var currUserAvatar = document.createElement('img');
 		inputContainer.id = 'inputContainer';
-		inputArea.id = 'inputArea';
-		postBt.id = 'postBt';
-		logoutBt.id = 'logoutBt';
-		currUserAvatar.id = 'currUserAvatar';
-		var inputAreaStyle = {
-			boxSizing : 'border-box',
-			width : '310px',
-			resize : 'none'
-		};
-		xfz.setStyle(inputArea, inputAreaStyle);
-		var inputContainerStyle = {
-			paddingLeft : '5px',
-			paddingRight : '5px',
-			paddingBotton : '0px',
-			height : '65px'
-		};
-		xfz.setStyle(inputContainer, inputContainerStyle);
-		var postBtStyle = {
-			paddingRight : '5px',
-			marginTop: '-5px'
-		};
-		xfz.setStyle(postBt, postBtStyle);
-		var currUserAvatarStyle = {
-			width : '32px',
-			height : '32px',
-			paddingRight : '3px',
-			float : 'left'
-		};
-		xfz.setStyle(currUserAvatar, currUserAvatarStyle);
-		postBt.innerHTML = '发布';
-		logoutBt.innerHTML = '注销';
+		inputContainer.classList.add('t-input-container');
 
+		var textarea = document.createElement('textarea');
+		textarea.id = 'inputTextarea';
+		textarea.classList.add('t-input-textarea');
+
+		var inputBox = document.createElement('div');
+		inputBox.classList.add('t-input');
+		inputBox.appendChild(textarea);
+
+		var currUserAvatar = document.createElement('img');
+		currUserAvatar.id = 'currUserAvatar';
+		currUserAvatar.classList.add('t-avatar');
+
+		var avatarContainer = document.createElement('div');
+		avatarContainer.classList.add('t-avatar-container');
+		avatarContainer.appendChild(currUserAvatar);
+
+		window.addEventListener('keyup', function (event) {
+			if (event.defaultPrevented) {
+				return
+			}
+			console.log(event.key);
+			if (event.key === 'Enter' && event.ctrlKey) {
+				console.log('pressed enter and control');
+			}
+			event.preventDefault()
+		});
+		/*
 		logoutBt.addEventListener('click', function(e){
 				var target = e.target;
-				xfz.status.page = 'logout';
-				xfz.setPage();
+				XFZ.status.page = 'logout';
+				XFZ.setPage();
 			}, false);
-
+		console.log('here')
 		postBt.addEventListener('click', function(e){
 			var target = e.target;
 			var inputArea = document.getElementById('inputArea');
@@ -125,12 +121,12 @@ var xfz = {
 			parameter.text = inputArea.value;
 			console.log(parameter);
 
-			xfz.Post('/action/postStatus', parameter, function(data){
+			XFZ.Post('/action/postStatus', parameter, function(data){
 				document.getElementById('inputArea').value = 'sent';
 			});
 		}, false);
-
-		xfz.appendChilds(inputContainer, [currUserAvatar, inputArea, postBt, logoutBt]);
+		*/
+		XFZ.appendChilds(inputContainer, [avatarContainer, inputBox]);
 
 		return inputContainer;
 	},
@@ -139,8 +135,9 @@ var xfz = {
 	 */
 	setTimeline : function(data, hidden){
 		var ol = document.getElementById('ol');
-		var status, li, userAvatarCell, userAvatar, content, count;
+		var status, li, timelineContainer, userAvatarCell, userAvatar, content, count;
 		var contentTop, contentBottom, controlPanel, reply, hr;
+		// these css will move to the css file in the future
 		var liStyle = {
 			width : '340px',
 			minHeight : '60px',
@@ -151,10 +148,9 @@ var xfz = {
 			marginTop: '-3px'
 		};
 		var userAvatarCellStyle = {
-			display : 'inline-block',
-			width : '12%',
 			height : '32px',
-			float : 'left'
+			gridColumnStart : '1',
+			gridColumnEnd : '2'
 		};
 		var userAvatarStyle = {
 			width: '32px',
@@ -162,8 +158,8 @@ var xfz = {
 			fontSize: '12px',
 		};
 		var contentStyle = {
-			width: '83%',
-			display : 'inline-block'
+			gridColumnStart : '2',
+			gridColumnEnd : '3'
 		};
 		var contentTopStyle = {
 			display: 'block',
@@ -174,10 +170,9 @@ var xfz = {
 			fontSize: '12px',
 		};
 		var controlPanelStyle = {
-			display: 'inline-block',
-			width: '5%',
 			height: '60px',
-			float: 'right',
+			gridColumnStart : '3',
+			gridColumnEnd : 'end'
 			//marginRight : '20px'
 		};
 		var replyStyle = {
@@ -199,23 +194,25 @@ var xfz = {
 		for(count in data){
 			status = data[count];
 			li = document.createElement('li');
-			xfz.setStyle(li, liStyle);
+			XFZ.setStyle(li, liStyle);
+			timelineContainer = document.createElement('div');
+			timelineContainer.classList.add('timelineContainer');
 			userAvatarCell = document.createElement('a');
-			xfz.setStyle(userAvatarCell, userAvatarCellStyle);
+			XFZ.setStyle(userAvatarCell, userAvatarCellStyle);
 			userAvatar = document.createElement('img');
-			xfz.setStyle(userAvatar, userAvatarStyle);
+			XFZ.setStyle(userAvatar, userAvatarStyle);
 			userAvatar.src = status.user.profile_image_url;
 			userAvatarCell.appendChild(userAvatar);
 			content = document.createElement('div');
 			content.id = status.id;
-			xfz.setStyle(content, contentStyle);
+			XFZ.setStyle(content, contentStyle);
 			contentTop = document.createElement('a');
 			contentTop.innerHTML = status.user.name;
-			xfz.setStyle(contentTop, contentTopStyle);
+			XFZ.setStyle(contentTop, contentTopStyle);
 			contentBottom = document.createElement('span');
-			xfz.setStyle(contentBottom, contentBottomStyle);
+			XFZ.setStyle(contentBottom, contentBottomStyle);
 			contentBottom.innerHTML = status.text;
-			xfz.appendChilds(content, [contentTop, contentBottom]);
+			XFZ.appendChilds(content, [contentTop, contentBottom]);
 			controlPanel = document.createElement('span');
 			if(status.is_self == false || status.is_self == 'false'){
 				reply = document.createElement('a');
@@ -257,7 +254,7 @@ var xfz = {
 				destroy.innerHTML = 'D';
 				destroy.dataset.msgId = status.id;
 				destroy.addEventListener('click', function(e){
-					xfz.Post('/action/destroyStatus', {msgId : e.target.dataset.msgId}, function(data){
+					XFZ.Post('/action/destroyStatus', {msgId : e.target.dataset.msgId}, function(data){
 						if(data.success == true){
 							var last
 							var element = document.getElementById(e.target.dataset.msgId).parentElement;
@@ -270,10 +267,11 @@ var xfz = {
 				}, false);
 				controlPanel.appendChild(destroy);
 			}
-			xfz.setStyle(controlPanel, controlPanelStyle);
-			xfz.appendChilds(li, [userAvatarCell, content, controlPanel]);
+			XFZ.setStyle(controlPanel, controlPanelStyle);
+			XFZ.appendChilds(timelineContainer, [userAvatarCell, content, controlPanel]);
+			li.appendChild(timelineContainer);
 			hr = document.createElement('hr');
-			xfz.setStyle(hr, hrStyle);
+			XFZ.setStyle(hr, hrStyle);
 			li.addEventListener('mouseover', function(e){
 				console.log(e);
 				if (e.target.localName === 'li'){
@@ -303,18 +301,18 @@ var xfz = {
 		}
 	},
 	setBody : function(){
-		switch(xfz.status.nav){
+		switch(XFZ.status.nav){
 			case 'timeline' : 
-				xfz.body.timeline();
+				XFZ.body.timeline();
 				break;
 			case 'mention' :
-				xfz.body.mention();
+				XFZ.body.mention();
 				break;
 			case 'message' :
-				xfz.body.message();
+				XFZ.body.message();
 				break;
 			case 'favorite' :
-				xfz.body.favorite();
+				XFZ.body.favorite();
 				break;
 		}
 	},
@@ -322,9 +320,9 @@ var xfz = {
 	* get new timeline based on the last message id
 	*/
 	checkNewTimeline : function(){
-		var first = document.getElementsByClassName('first')[0].childNodes[1];
+		var first = document.getElementsByClassName('first')[0].childNodes[0].childNodes[1];
 		var notification;
-		xfz.Post('/action/checkNewTimeline', {firstId: first.id}, function(data){
+		XFZ.Post('/action/checkNewTimeline', {firstId: first.id}, function(data){
 			if(data.success){
 				if(data.data.length > 0){
 					notification = document.getElementById('timelineNotification');
@@ -340,7 +338,7 @@ var xfz = {
 							textAlign : 'center'
 						}
 						button.innerHTML = data.data.length;
-						xfz.setStyle(button, buttonStyle);
+						XFZ.setStyle(button, buttonStyle);
 						notification.appendChild(button);
 						button.addEventListener('click', function(e){
 							var i = 0;
@@ -352,7 +350,7 @@ var xfz = {
 							}
 						}, false);
 					}
-					xfz.setTimeline(data.data, true);
+					XFZ.setTimeline(data.data, true);
 				}
 			}
 		});
@@ -360,7 +358,7 @@ var xfz = {
 	body : {
 		timeline : function(){
 			document.getElementById('bodyContainer').innerHTML = '载入中..';
-			if(xfz.status.notMain){
+			if(XFZ.status.notMain){
 				bodyContainer.innerHTML = 'Under construction';
 			}
 			else{
@@ -370,7 +368,7 @@ var xfz = {
 					height: '550px',
 					overflowY : 'scroll'
 				};
-				xfz.setStyle(timeline, timelineStyle);
+				XFZ.setStyle(timeline, timelineStyle);
 				var timelineNotification = document.createElement('div');
 				timelineNotification.id = 'timelineNotification';
 				var timelineStream = document.createElement('div');
@@ -379,8 +377,8 @@ var xfz = {
 				ol.id = 'ol';
 				timelineStream.appendChild(ol);
 
-				xfz.appendChilds(timeline, [timelineNotification, timelineStream]);
-				xfz.Get('/action/getCurrUserHomeTimeline', function(data){
+				XFZ.appendChilds(timeline, [timelineNotification, timelineStream]);
+				XFZ.Get('/action/getCurrUserHomeTimeline', function(data){
 					if(!data.data){
 						var li = document.createElement('li');
 						li.style.listStyleType = 'none';
@@ -390,7 +388,7 @@ var xfz = {
 					else{
 						bodyContainer.innerHTML = '';
 						bodyContainer.appendChild(timeline);
-						xfz.setTimeline(data.data);
+						XFZ.setTimeline(data.data);
 						if(data.data.length >= 10){
 							timeline.addEventListener('scroll', function(e){
 								var target = e.target;
@@ -398,21 +396,21 @@ var xfz = {
 								var height = target.scrollHeight;
 								var currHeight = target.clientHeight;
 								var gap = top / (height - currHeight) * 100;
-								if(gap >= 70 && !xfz.status.loadingContent){
-									xfz.status.loadingContent = true;
+								if(gap >= 70 && !XFZ.status.loadingContent){
+									XFZ.status.loadingContent = true;
 									console.log('bottom');
 									var last = document.getElementsByClassName('last')[0];
-									var contentId = last.firstChild.nextSibling.id;
+									var contentId = last.childNodes[0].childNodes[1].id;
 									var loadingLi = document.createElement('li');
 									loadingLi.innerHTML = '载入中..';
 									last.parentNode.appendChild(loadingLi);
-									xfz.Post('/action/getHomeTimelineBeforeLast', {contentId: contentId}, function(data){
+									XFZ.Post('/action/getHomeTimelineBeforeLast', {contentId: contentId}, function(data){
 										var parent = document.getElementById('ol');
 										if(data.success){
 											parent.removeChild(parent.lastChild);
 											document.getElementsByClassName('last')[0].classList.remove('last');
-											xfz.setTimeline(data.data);
-											xfz.status.loadingContent = false;
+											XFZ.setTimeline(data.data);
+											XFZ.status.loadingContent = false;
 										}
 									});
 								}
@@ -421,7 +419,7 @@ var xfz = {
 							}, false);
 						}
 						setInterval(function(){
-							xfz.checkNewTimeline();
+							XFZ.checkNewTimeline();
 						}, 10 * 1000);
 					}
 				});
@@ -444,21 +442,21 @@ var xfz = {
 			var containerStyle = {
 				overflow : 'hidden'
 			}
-			xfz.setStyle(container, containerStyle);
-			xfz.Get('/action/authorize', function(data){
+			XFZ.setStyle(container, containerStyle);
+			XFZ.Get('/action/authorize', function(data){
 				if(!data.success){
 					window.location = data.url;
 				}
 				else{
-					xfz.status.page = 'main';
-					xfz.setPage();
+					XFZ.status.page = 'main';
+					XFZ.setPage();
 				}
 			});
 		},
 		logout : function(){
 			container.innerHTML = '载入中..';
 			var div = document.createElement('div');
-			xfz.Get('/action/logout', function(data){
+			XFZ.Get('/action/logout', function(data){
 				if(data.success){
 					container.innerHTML = '登出成功!';
 				}
@@ -477,7 +475,7 @@ var xfz = {
 				height : '20px',
 				width : '350px'
 			}
-			xfz.setStyle(navBarContainer, navBarContainerStyle);
+			XFZ.setStyle(navBarContainer, navBarContainerStyle);
 			timelineBar.innerHTML = 'Timeline';
 			var timelineBarStyle = {
 				display: 'inline-block',
@@ -486,7 +484,7 @@ var xfz = {
 				paddingRight : '10px',
 				borderBottom : '5px'
 			}
-			xfz.setStyle(timelineBar, timelineBarStyle);
+			XFZ.setStyle(timelineBar, timelineBarStyle);
 			navBarContainer.appendChild(timelineBar);
 
 			var bodyContainer = document.createElement('div');
@@ -494,25 +492,24 @@ var xfz = {
 			var timeline = document.createElement('div');
 			
 
-			xfz.Get('/action/getCurrUser', function(data){
+			XFZ.Get('/action/getCurrUser', function(data){
 				if(data.success){
-					var inputContainer = xfz.setInput();
-					xfz.status.currUser = data.data;
+					var inputContainer = XFZ.setInput();
+					XFZ.status.currUser = data.data;
 					container.innerHTML = '';
-					xfz.appendChilds(div, [inputContainer, navBarContainer, bodyContainer]);
+					XFZ.appendChilds(div, [inputContainer, navBarContainer, bodyContainer]);
 					container.appendChild(div);
 
-					console.log(xfz.status.currUser);
-					document.getElementById('currUserAvatar').src = xfz.status.currUser.profile_image_url;
-					xfz.status.nav = 'timeline';
-					xfz.status.notCurrUser = false;
-					xfz.setBody();
+					console.log(XFZ.status.currUser);
+					document.getElementById('currUserAvatar').src = XFZ.status.currUser.profile_image_url;
+					XFZ.status.nav = 'timeline';
+					XFZ.status.notCurrUser = false;
+					XFZ.setBody();
 				}
 			});
 
 		},
 	}
 };
-
-xfz.init();
+XFZ.init();
 			

@@ -1,4 +1,4 @@
-#titleBar {
+#t-title-bar {
 	background: grey;
 	margin-top: -10px;
 	margin-left: -5px;
@@ -6,4 +6,44 @@
 	height: 20px;
 	width: 100%;
 	-webkit-app-region: drag;
+}
+
+.t-timeline-container {
+	display: 'grid';
+	grid-template-columns: 32px auto 5%;
+	grid-template-rows: 32% 32% 32% 4%;
+}
+
+.t-input-textarea {
+	width: 100%;
+	height: 100%;
+	padding: 0;
+	resize: none;
+}
+
+.t-input {
+	width: 100%;
+	height: 90%;
+}
+
+.t-input-container {
+	display: grid;
+	grid-template-columns: 42px 415px;
+	grid-gap: 3px;
+	height: 65px;
+	padding-bottom: 5px;
+}
+
+.t-post-btn {
+	padding-right : 5px;
+	margin-top: -5px;
+}
+
+.t-avatar {
+	width: 42px;
+	height: 42px;
+}
+
+.t-avatar-container {
+	width: 100%;
 }

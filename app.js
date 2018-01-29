@@ -18,7 +18,7 @@ var mainWindow = null;
 
 var init = function(){
     var windowStyle = {
-        width: 376, 
+        width: 500, 
         height: 640,
         autoHideMenuBar: true,
         backgroundColor: 'white'
