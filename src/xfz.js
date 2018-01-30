@@ -9,6 +9,11 @@ var XFZ = {
 		input: {
 			message: ''
 		},
+		timeline: {
+			data: [],
+			first: '',
+			last: ''
+		},
 		nav : 'home',
 		notMain : false,
 		loadingContent : false
@@ -94,37 +99,37 @@ var XFZ = {
 			event.preventDefault()
 		});
 		/*
-		logoutBt.addEventListener('click', function(e){
+			logoutBt.addEventListener('click', function(e){
+					var target = e.target;
+					XFZ.status.page = 'logout';
+					XFZ.setPage();
+				}, false);
+			console.log('here')
+			postBt.addEventListener('click', function(e){
 				var target = e.target;
-				XFZ.status.page = 'logout';
-				XFZ.setPage();
-			}, false);
-		console.log('here')
-		postBt.addEventListener('click', function(e){
-			var target = e.target;
-			var inputArea = document.getElementById('inputArea');
-			var parameter = {};
-			var textArray = inputArea.value.split(' ');
-			var char;
-			for(var i = 0; i < textArray.length; i++){
-				char = textArray[i].split('');
-				if(char[0] === '@'){
-					console.log('textArray :' + textArray[i]);
-					console.log('inputArea.dataset :');
-					console.log(inputArea.dataset);
-					if(textArray[i] === '@' + inputArea.dataset.replyToName){
-						parameter = inputArea.dataset;
-						parameter.isReply = true;
+				var inputArea = document.getElementById('inputArea');
+				var parameter = {};
+				var textArray = inputArea.value.split(' ');
+				var char;
+				for(var i = 0; i < textArray.length; i++){
+					char = textArray[i].split('');
+					if(char[0] === '@'){
+						console.log('textArray :' + textArray[i]);
+						console.log('inputArea.dataset :');
+						console.log(inputArea.dataset);
+						if(textArray[i] === '@' + inputArea.dataset.replyToName){
+							parameter = inputArea.dataset;
+							parameter.isReply = true;
+						}
 					}
 				}
-			}
-			parameter.text = inputArea.value;
-			console.log(parameter);
+				parameter.text = inputArea.value;
+				console.log(parameter);
 
-			XFZ.Post('/action/postStatus', parameter, function(data){
-				document.getElementById('inputArea').value = 'sent';
-			});
-		}, false);
+				XFZ.Post('/action/postStatus', parameter, function(data){
+					document.getElementById('inputArea').value = 'sent';
+				});
+			}, false);
 		*/
 		XFZ.appendChilds(inputContainer, [avatarContainer, inputBox]);
 
