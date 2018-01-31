@@ -139,9 +139,7 @@ var XFZ = {
 	 *Setup the timeline
 	 */
 	setTimeline : function(data, hidden){
-		var ol = document.getElementById('ol');
-		var status, li, timelineContainer, userAvatarCell, userAvatar, content, count;
-		var contentTop, contentBottom, controlPanel, reply, hr;
+		var timelineStream = document.getElementById('timelineStream');
 		// these css will move to the css file in the future
 		var liStyle = {
 			width : '340px',
@@ -194,30 +192,48 @@ var XFZ = {
 		};
 		console.log(data[0]);
 		console.log(data[1]);
-		ol.style.paddingLeft = '0';
+		timelineStream.style.paddingLeft = '0';
 		//for each data create a message block
-		for(count in data){
-			status = data[count];
-			li = document.createElement('li');
-			XFZ.setStyle(li, liStyle);
-			timelineContainer = document.createElement('div');
-			timelineContainer.classList.add('timelineContainer');
-			userAvatarCell = document.createElement('a');
-			XFZ.setStyle(userAvatarCell, userAvatarCellStyle);
+		var message, messageContainer;
+		var leftCell, userAvatarLink, userAvatar;
+		var middleCell, middleTop, content;
+		var controlPanel, reply, hr;
+		for(var i = 0; i < data.length; i++){
+			message = data[i];
+			
+			// A contianer for each message
+			messageContainer = document.createElement('li');
+			messageContainer.classList.add('t-message-container');
+			
+			// Left cell
+			leftCell = document.createElement('div');
+			userAvatarLink = document.createElement('a');
 			userAvatar = document.createElement('img');
-			XFZ.setStyle(userAvatar, userAvatarStyle);
+			userAvatar.classList.add('t-avatar')
 			userAvatar.src = status.user.profile_image_url;
-			userAvatarCell.appendChild(userAvatar);
-			content = document.createElement('div');
-			content.id = status.id;
-			XFZ.setStyle(content, contentStyle);
-			contentTop = document.createElement('a');
-			contentTop.innerHTML = status.user.name;
-			XFZ.setStyle(contentTop, contentTopStyle);
-			contentBottom = document.createElement('span');
-			XFZ.setStyle(contentBottom, contentBottomStyle);
-			contentBottom.innerHTML = status.text;
-			XFZ.appendChilds(content, [contentTop, contentBottom]);
+			userAvatarLink.appendChild(userAvatar);
+			leftCell.appendChild(userAvatarLink);
+			
+			messageContainer.appendChild(leftCell);
+
+			// Middle cell
+			middleCell = document.createElement('div');
+			middleCell.classList.add('t-middle-cell');
+			middleTop = document.createElement('a');
+			username = document.createElement('span');
+			username.classList.add('t-username');
+			username.innerHTML = status.user.name;
+			middleTop.appendChild(username);
+			middleCell.appendChild(middleTop);
+
+			content = document.createElement('p');
+			content.classList.add('t-content')
+			content.innerHTML = status.text;
+			middleCell.appendChild(content);
+
+			messageContainer.appendChild(middleCell);
+			
+			// Right cell
 			controlPanel = document.createElement('span');
 			if(status.is_self == false || status.is_self == 'false'){
 				reply = document.createElement('a');
@@ -290,17 +306,17 @@ var XFZ = {
 			li.appendChild(hr);
 			if(hidden){
 				li.style.display = 'none';
-				ol.insertBefore(li, document.getElementsByClassName('first')[0]);
+				timelineStream.insertBefore(li, document.getElementsByClassName('first')[0]);
 				document.getElementsByClassName('first')[0].classList.remove('first');
 				li.classList.add('unread');
 			}
 			else{
-				ol.appendChild(li);
-				if(count == data.length - 1){
+				timelineStream.appendChild(li);
+				if(i == data.length - 1){
 					li.classList.add('last');
 				}
 			}
-			if(li == ol.firstChild){
+			if(li == timelineStream.firstChild){
 				li.classList.add('first');
 			}
 		}
@@ -369,18 +385,15 @@ var XFZ = {
 			else{
 				var timeline = document.createElement('div');
 				timeline.id = 'timeline';
-				var timelineStyle = {
-					height: '550px',
-					overflowY : 'scroll'
-				};
-				XFZ.setStyle(timeline, timelineStyle);
+				timeline.classList.add('t-timeline-container')
+
+				// The notification area
 				var timelineNotification = document.createElement('div');
 				timelineNotification.id = 'timelineNotification';
-				var timelineStream = document.createElement('div');
+
+				// The main timeline container. Contains message container
+				var timelineStream = document.createElement('ol');
 				timelineStream.id = 'timelineStream';
-				var ol = document.createElement('ol');
-				ol.id = 'ol';
-				timelineStream.appendChild(ol);
 
 				XFZ.appendChilds(timeline, [timelineNotification, timelineStream]);
 				XFZ.Get('/action/getCurrUserHomeTimeline', function(data){
@@ -403,7 +416,6 @@ var XFZ = {
 								var gap = top / (height - currHeight) * 100;
 								if(gap >= 70 && !XFZ.status.loadingContent){
 									XFZ.status.loadingContent = true;
-									console.log('bottom');
 									var last = document.getElementsByClassName('last')[0];
 									var contentId = last.childNodes[0].childNodes[1].id;
 									var loadingLi = document.createElement('li');
@@ -419,8 +431,6 @@ var XFZ = {
 										}
 									});
 								}
-								console.log(gap);
-
 							}, false);
 						}
 						setInterval(function(){

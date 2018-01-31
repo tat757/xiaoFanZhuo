@@ -13,6 +13,8 @@ body {
 
 .t-timeline-container {
 	padding: 0;
+	height: 550px;
+	overflow-y : scroll;
 }
 
 .t-input-textarea {
@@ -52,6 +54,23 @@ body {
 
 .t-message-container {
 	display: grid;
-	grid-template-columns: 42px 85% 5%;
-	grid-gap: 3px;
+	grid-template-columns: 10% 85% 5%;
+	grid-gap: 5px;
+	width: 100%;
+	min-height: 65px;
+	margin-bottom: 5px;
+}
+
+.t-middle-cell {
+	display: grid;
+	grid-template-rows: 15px auto;
+	grid-gap: 5px;
+}
+
+.t-username {
+	width: 100%;
+}
+
+.t-content {
+	width: 100%;
 }
