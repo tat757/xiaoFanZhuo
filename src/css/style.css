@@ -1,5 +1,6 @@
 body {
 	margin: 5px;
+	background-color: #EEEEEE;
 }
 #t-title-bar {
 	background: grey;
@@ -54,11 +55,21 @@ body {
 
 .t-message-container {
 	display: grid;
-	grid-template-columns: 10% 85% 5%;
+	grid-template-columns: 10% 80% 5%;
 	grid-gap: 5px;
 	width: 100%;
 	min-height: 65px;
 	margin-bottom: 5px;
+	padding: 3px;
+	background-color: #FFFFFF;
+}
+
+light {
+	background-color: #F5F5F5 !important;
+}
+
+.t-message-container:hover{
+	background-color: #0000;
 }
 
 .t-middle-cell {
@@ -67,10 +78,30 @@ body {
 	grid-gap: 5px;
 }
 
+.t-middle-cell {
+	display: grid;
+	grid-template-rows: 30% 30% 30%;
+	grid-gap: 3%;
+}
+
+.t-right-cell {
+	padding-right: 15px;
+}
+
+.t-right-child-cell {
+	width: 100%;
+}
+
 .t-username {
 	width: 100%;
 }
 
 .t-content {
 	width: 100%;
+}
+
+.t-timeline-stream {
+	padding: 0;
+	font-size: 12px;
+	margin: 0;
 }

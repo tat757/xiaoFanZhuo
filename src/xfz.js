@@ -140,77 +140,29 @@ var XFZ = {
 	 */
 	setTimeline : function(data, hidden){
 		var timelineStream = document.getElementById('timelineStream');
-		// these css will move to the css file in the future
-		var liStyle = {
-			width : '340px',
-			minHeight : '60px',
-			listStyleType : 'none',
-			paddingLeft: '2px',
-			paddingTop: '2px',
-			paddingRight: '2px',
-			marginTop: '-3px'
-		};
-		var userAvatarCellStyle = {
-			height : '32px',
-			gridColumnStart : '1',
-			gridColumnEnd : '2'
-		};
-		var userAvatarStyle = {
-			width: '32px',
-			height : '32px',
-			fontSize: '12px',
-		};
-		var contentStyle = {
-			gridColumnStart : '2',
-			gridColumnEnd : '3'
-		};
-		var contentTopStyle = {
-			display: 'block',
-			fontSize : '13px',
-		};
-		var contentBottomStyle = {
-			display: 'block',
-			fontSize: '12px',
-		};
-		var controlPanelStyle = {
-			height: '60px',
-			gridColumnStart : '3',
-			gridColumnEnd : 'end'
-			//marginRight : '20px'
-		};
-		var replyStyle = {
-			position : 'absolute',
-			zIndex : '1',
-			right : '5px'
-		};
-		var hrStyle = {
-			width : '360px',
-			marginTop : '2px',
-			marginBottom : '2px',
-			marginLeft : '0px',
-			marginRight : '0px'
-		};
+		timelineStream.classList.add('t-timeline-stream');
+
 		console.log(data[0]);
-		console.log(data[1]);
-		timelineStream.style.paddingLeft = '0';
 		//for each data create a message block
 		var message, messageContainer;
 		var leftCell, userAvatarLink, userAvatar;
 		var middleCell, middleTop, content;
-		var controlPanel, reply, hr;
+		var rightCell, rightTop, rightMiddle, rightBottom;
+		var reply, destroy;
 		for(var i = 0; i < data.length; i++){
 			message = data[i];
 			
 			// A contianer for each message
 			messageContainer = document.createElement('li');
 			messageContainer.classList.add('t-message-container');
+			messageContainer.id = data.rawid;
 			
 			// Left cell
 			leftCell = document.createElement('div');
 			userAvatarLink = document.createElement('a');
 			userAvatar = document.createElement('img');
 			userAvatar.classList.add('t-avatar')
-			userAvatar.src = status.user.profile_image_url;
+			userAvatar.src = message.user.profile_image_url;
 			userAvatarLink.appendChild(userAvatar);
 			leftCell.appendChild(userAvatarLink);
 			
@@ -222,38 +174,55 @@ var XFZ = {
 			middleTop = document.createElement('a');
 			username = document.createElement('span');
 			username.classList.add('t-username');
-			username.innerHTML = status.user.name;
+			username.innerHTML = message.user.name;
 			middleTop.appendChild(username);
 			middleCell.appendChild(middleTop);
 
 			content = document.createElement('p');
 			content.classList.add('t-content')
-			content.innerHTML = status.text;
+			content.innerHTML = message.text;
 			middleCell.appendChild(content);
 
 			messageContainer.appendChild(middleCell);
 			
 			// Right cell
-			controlPanel = document.createElement('span');
-			if(status.is_self == false || status.is_self == 'false'){
-				reply = document.createElement('a');
+			rightCell = document.createElement('div');
+			rightCell.classList.add('t-right-cell');
+			
+			rightTop = document.createElement('div');
+			rightTop.classList.add('t-right-child-cell');
+			rightCell.appendChild(rightTop);
+
+			rightMiddle = document.createElement('div');
+			rightMiddle.classList.add('t-right-child-cell');
+			rightCell.appendChild(rightMiddle);
+			
+			rightBottom = document.createElement('div');
+			rightBottom.classList.add('t-right-child-cell');
+			rightCell.appendChild(rightBottom);
+
+			messageContainer.appendChild(rightCell);
+
+			if(!message.is_self || message.is_self === 'false'){
+				reply = document.createElement('button');
+				rightTop.appendChild(reply);
 				reply.innerHTML = 'R';
-				reply.dataset.replyToName = status.user.name;
-				reply.dataset.replyToId = status.user.id;
-				reply.dataset.replyId = status.id;
+				reply.dataset.messageRawid = message.rawid
 				reply.addEventListener('click', function(e){
-					var inputArea = document.getElementById('inputArea');
+					var inputArea = document.getElementById('inputTextarea');
 					var atUserList = [];
 					var char;
 					inputArea.focus();
-					inputArea.dataset.replyId = e.target.dataset.replyId;
-					inputArea.dataset.replyToId = e.target.dataset.replyToId;
-					inputArea.dataset.replyToName = e.target.dataset.replyToName;
-					inputArea.dataset.isReply = true;
-					var text = document.getElementById(e.target.dataset.replyId).lastChild.innerHTML;
-					console.log(text);
-					var textArray = text.split(' ');
-					console.log(textArray);
+					var item;
+					console.log(XFZ.status.timeline.data)
+					for (var i = XFZ.status.timeline.data.length - 1; i >= 0; i--) {
+						item = XFZ.status.timeline.data[i];
+						if (item.rawid === e.target.dataset.messageRawid) {
+							break;
+						}
+					}
+					console.log(item);
+					console.log(e.target.dataset.messageRawid);
 					//找到原消息中所有被@的用户
 					for(var i = 0; i < textArray.length; i++){
 						char = textArray[i].split('');
@@ -266,17 +235,16 @@ var XFZ = {
 						inputArea.value += atUserList + ' ';
 					}
 				}, false);
-
-				controlPanel.appendChild(reply);
 			}
 			else{
-				destroy = document.createElement('a');
+				destroy = document.createElement('button');
+				rightTop.appendChild(destroy);
 				//当发布信息的用户是自己的话,回复键改为删除键
 				destroy.innerHTML = 'D';
-				destroy.dataset.msgId = status.id;
+				destroy.dataset.msgId = message.id;
 				destroy.addEventListener('click', function(e){
 					XFZ.Post('/action/destroyStatus', {msgId : e.target.dataset.msgId}, function(data){
-						if(data.success == true){
+						if(data.success){
 							var last
 							var element = document.getElementById(e.target.dataset.msgId).parentElement;
 							if(element.classList.contains('first')){
@@ -286,38 +254,20 @@ var XFZ = {
 						}
 					});
 				}, false);
-				controlPanel.appendChild(destroy);
 			}
-			XFZ.setStyle(controlPanel, controlPanelStyle);
-			XFZ.appendChilds(timelineContainer, [userAvatarCell, content, controlPanel]);
-			li.appendChild(timelineContainer);
-			hr = document.createElement('hr');
-			XFZ.setStyle(hr, hrStyle);
-			li.addEventListener('mouseover', function(e){
-				console.log(e);
-				if (e.target.localName === 'li'){
-					e.target.style.setProperty('background-color','#5EA8C9','important');
-				}
-			});
-			li.addEventListener('mouseleave', function(e){
-				console.log(e);
-				e.target.style.setProperty('background-color','white','important');
-			});
-			li.appendChild(hr);
 			if(hidden){
-				li.style.display = 'none';
-				timelineStream.insertBefore(li, document.getElementsByClassName('first')[0]);
+				messageContainer.style.display = 'none';
+				timelineStream.insertBefore(messageContainer, document.getElementsByClassName('first')[0]);
 				document.getElementsByClassName('first')[0].classList.remove('first');
-				li.classList.add('unread');
-			}
-			else{
-				timelineStream.appendChild(li);
-				if(i == data.length - 1){
-					li.classList.add('last');
+				messageContainer.classList.add('unread');
+			} else {
+				timelineStream.appendChild(messageContainer);
+				if(i === data.length - 1){
+					messageContainer.classList.add('last');
 				}
 			}
-			if(li == timelineStream.firstChild){
-				li.classList.add('first');
+			if(messageContainer === timelineStream.firstChild){
+				messageContainer.classList.add('first');
 			}
 		}
 	},
@@ -406,6 +356,7 @@ var XFZ = {
 					else{
 						bodyContainer.innerHTML = '';
 						bodyContainer.appendChild(timeline);
+						XFZ.status.timeline.data = data.data;
 						XFZ.setTimeline(data.data);
 						if(data.data.length >= 10){
 							timeline.addEventListener('scroll', function(e){
