@@ -11,6 +11,8 @@ var XFZ = {
 		},
 		timeline: {
 			data: [],
+			cache: {},
+			count: 0,
 			first: '',
 			last: ''
 		},
@@ -92,7 +94,6 @@ var XFZ = {
 			if (event.defaultPrevented) {
 				return
 			}
-			console.log(event.key);
 			if (event.key === 'Enter' && event.ctrlKey) {
 				console.log('pressed enter and control');
 			}
@@ -155,7 +156,7 @@ var XFZ = {
 			// A contianer for each message
 			messageContainer = document.createElement('li');
 			messageContainer.classList.add('t-message-container');
-			messageContainer.id = data.rawid;
+			messageContainer.id = message.rawid;
 			
 			// Left cell
 			leftCell = document.createElement('div');
@@ -257,17 +258,14 @@ var XFZ = {
 			}
 			if(hidden){
 				messageContainer.style.display = 'none';
-				timelineStream.insertBefore(messageContainer, document.getElementsByClassName('first')[0]);
-				document.getElementsByClassName('first')[0].classList.remove('first');
+				timelineStream.insertBefore(messageContainer, document.getElementById(XFZ.status.timeline.first));
 				messageContainer.classList.add('unread');
 			} else {
 				timelineStream.appendChild(messageContainer);
-				if(i === data.length - 1){
-					messageContainer.classList.add('last');
-				}
+				XFZ.status.timeline.last = messageContainer.id;
 			}
 			if(messageContainer === timelineStream.firstChild){
-				messageContainer.classList.add('first');
+				XFZ.status.timeline.first = messageContainer.id;
 			}
 		}
 	},
@@ -291,13 +289,17 @@ var XFZ = {
 	* get new timeline based on the last message id
 	*/
 	checkNewTimeline : function(){
-		var first = document.getElementsByClassName('first')[0].childNodes[0].childNodes[1];
+		var item = XFZ.findItemByRawid(XFZ.status.timeline.first, XFZ.status.timeline.cache);
+		console.log('item is here');
+		console.log(item);
 		var notification;
-		XFZ.Post('/action/checkNewTimeline', {firstId: first.id}, function(data){
+		XFZ.Post('/action/checkNewTimeline', {firstId: item.id}, function(data){
 			if(data.success){
 				if(data.data.length > 0){
 					notification = document.getElementById('timelineNotification');
 					// if the notification already here, plus new number to it
+					var result = XFZ.setCacheData(data.data, XFZ.status.timeline.cache, XFZ.status.timeline.data, true);
+					XFZ.setTimelineDataAndCache(XFZ.status.timeline, result.data, result.cache);
 					if(notification.innerHTML !== ''){
 						notification.firstChild.innerHTML = data.data.length + +notification.firstChild.innerHTML;
 					}
@@ -312,10 +314,9 @@ var XFZ = {
 						XFZ.setStyle(button, buttonStyle);
 						notification.appendChild(button);
 						button.addEventListener('click', function(e){
-							var i = 0;
 							var unread = document.getElementsByClassName('unread');
 							document.getElementById('timelineNotification').innerHTML = '';
-							for(i = 0; i <= unread.length; i++){
+							for(var i = 0; i < unread.length; i++){
 								unread[count].style.display = 'block';
 								unread[count].classList.remove('unread');
 							}
@@ -333,6 +334,10 @@ var XFZ = {
 				bodyContainer.innerHTML = 'Under construction';
 			}
 			else{
+				var alert = document.createElement('div');
+				alert.id = 'alert';
+				alert.classList.add('t-alert');
+
 				var timeline = document.createElement('div');
 				timeline.id = 'timeline';
 				timeline.classList.add('t-timeline-container')
@@ -354,6 +359,8 @@ var XFZ = {
 						document.getElementById('ol').appendChild(li);
 					}
 					else{
+						var result = XFZ.setCacheData(data.data, XFZ.status.timeline.cache, XFZ.status.timeline.data, true);
+						XFZ.setTimelineDataAndCache(XFZ.status.timeline, result.data, result.cache);
 						bodyContainer.innerHTML = '';
 						bodyContainer.appendChild(timeline);
 						XFZ.status.timeline.data = data.data;
@@ -367,16 +374,16 @@ var XFZ = {
 								var gap = top / (height - currHeight) * 100;
 								if(gap >= 70 && !XFZ.status.loadingContent){
 									XFZ.status.loadingContent = true;
-									var last = document.getElementsByClassName('last')[0];
-									var contentId = last.childNodes[0].childNodes[1].id;
+									var contentId = XFZ.findItemByRawid(XFZ.status.timeline.last, XFZ.status.timeline.cache);
 									var loadingLi = document.createElement('li');
 									loadingLi.innerHTML = '载入中..';
-									last.parentNode.appendChild(loadingLi);
-									XFZ.Post('/action/getHomeTimelineBeforeLast', {contentId: contentId}, function(data){
-										var parent = document.getElementById('ol');
+									document.getElementById('timelineStream').appendChild(loadingLi);
+									XFZ.Post('/action/getHomeTimelineBeforeLast', {contentId: contentId.id}, function(data){
+										var parent = document.getElementById('timelineStream');
 										if(data.success){
+											var result = XFZ.setCacheData(data.data, XFZ.status.timeline.cache, XFZ.status.timeline.data, false);
+											XFZ.setTimelineDataAndCache(XFZ.status.timeline, result.data, result.cache);
 											parent.removeChild(parent.lastChild);
-											document.getElementsByClassName('last')[0].classList.remove('last');
 											XFZ.setTimeline(data.data);
 											XFZ.status.loadingContent = false;
 										}
@@ -466,7 +473,6 @@ var XFZ = {
 					XFZ.appendChilds(div, [inputContainer, navBarContainer, bodyContainer]);
 					container.appendChild(div);
 
-					console.log(XFZ.status.currUser);
 					document.getElementById('currUserAvatar').src = XFZ.status.currUser.profile_image_url;
 					XFZ.status.nav = 'timeline';
 					XFZ.status.notCurrUser = false;
@@ -475,6 +481,33 @@ var XFZ = {
 			});
 
 		},
+	},
+	setTimelineDataAndCache: function (timeline, data, cache) {
+		timeline.data = data.slice();
+		timeline.cache = JSON.parse(JSON.stringify(cache));
+	},
+	setCacheData: function (data, cache, items, fresh) {
+		var finalCache = cache ? JSON.parse(JSON.stringify(cache)) : {};
+		var finalData = items ? items.slice() : [];
+		var mode = fresh || true;
+		console.log('setCacheData');
+		console.log(data);
+		for (var i = data.length - 1; i >= 0; i--) {
+			if (fresh) {
+				finalData.unshift(data[i]);
+			} else {
+				finalData.push(data[i]);
+			}
+			// TODO: This may cause memory issue
+			finalCache[data[i].rawid] = data[i];
+		}
+		return {
+			data: finalData,
+			cache: finalCache
+		};
+	},
+	findItemByRawid: function (rawid, cache) {
+		return cache[rawid];
 	}
 };
 XFZ.init();

@@ -12,6 +12,12 @@ body {
 	-webkit-app-region: drag;
 }
 
+.t-alert {
+	display: none;
+	width: 100%;
+	height: 20px;
+}
+
 .t-timeline-container {
 	padding: 0;
 	height: 550px;
