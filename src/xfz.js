@@ -91,11 +91,19 @@ var XFZ = {
 		avatarContainer.appendChild(currUserAvatar);
 
 		window.addEventListener('keyup', function (event) {
+			var inputTextarea = document.getElementById('inputTextarea');
+			var parameter = {}
 			if (event.defaultPrevented) {
 				return
 			}
 			if (event.key === 'Enter' && event.ctrlKey) {
 				console.log('pressed enter and control');
+				if (inputTextarea.value !== '') {
+					parameter.text = inputTextarea.value;
+					XFZ.Post('/action/postStatus', parameter, function(data){
+						inputTextarea.value = '';
+					});
+				}
 			}
 			event.preventDefault()
 		});
@@ -205,9 +213,11 @@ var XFZ = {
 			messageContainer.appendChild(rightCell);
 
 			if(!message.is_self || message.is_self === 'false'){
-				reply = document.createElement('button');
+				reply = document.createElement('input');
 				rightTop.appendChild(reply);
-				reply.innerHTML = 'R';
+				reply.type = 'button'
+				reply.value = '回复';
+				reply.classList.add('t-right-top-button');
 				reply.dataset.messageRawid = message.rawid
 				reply.addEventListener('click', function(e){
 					var inputArea = document.getElementById('inputTextarea');
@@ -238,13 +248,15 @@ var XFZ = {
 				}, false);
 			}
 			else{
-				destroy = document.createElement('button');
+				destroy = document.createElement('input');
 				rightTop.appendChild(destroy);
 				//当发布信息的用户是自己的话,回复键改为删除键
-				destroy.innerHTML = 'D';
-				destroy.dataset.msgId = message.id;
+				destroy.type = 'button'
+				destroy.value = '删除';
+				destroy.id = message.id;
+				destroy.classList.add('t-right-top-button');
 				destroy.addEventListener('click', function(e){
-					XFZ.Post('/action/destroyStatus', {msgId : e.target.dataset.msgId}, function(data){
+					XFZ.Post('/action/destroyStatus', {msgId : e.target.id}, function(data){
 						if(data.success){
 							var last
 							var element = document.getElementById(e.target.dataset.msgId).parentElement;
@@ -317,8 +329,8 @@ var XFZ = {
 							var unread = document.getElementsByClassName('unread');
 							document.getElementById('timelineNotification').innerHTML = '';
 							for(var i = 0; i < unread.length; i++){
-								unread[count].style.display = 'block';
-								unread[count].classList.remove('unread');
+								unread[i].style.display = 'block';
+								unread[i].classList.toggle('unread');
 							}
 						}, false);
 					}

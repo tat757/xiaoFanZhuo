@@ -1,6 +1,15 @@
 body {
 	margin: 5px;
 	background-color: #EEEEEE;
+	font-family: "PingFang SC",
+				 "Helvetica Neue",
+				 "Hiragino Sans GB",
+				 "Microsoft YaHei",
+				 "微软雅黑",
+				 Helvetica,
+				 Arial,
+				 Verdana,
+				 sans-serif;
 }
 #t-title-bar {
 	background: grey;
@@ -61,7 +70,7 @@ body {
 
 .t-message-container {
 	display: grid;
-	grid-template-columns: 10% 80% 5%;
+	grid-template-columns: 10% 78% 5%;
 	grid-gap: 5px;
 	width: 100%;
 	min-height: 65px;
@@ -74,10 +83,6 @@ light {
 	background-color: #F5F5F5 !important;
 }
 
-.t-message-container:hover{
-	background-color: #0000;
-}
-
 .t-middle-cell {
 	display: grid;
 	grid-template-rows: 15px auto;
@@ -86,8 +91,8 @@ light {
 
 .t-middle-cell {
 	display: grid;
-	grid-template-rows: 30% 30% 30%;
-	grid-gap: 3%;
+	grid-template-rows: 15px auto 10%;
+	grid-gap: 2px;
 }
 
 .t-right-cell {
@@ -100,14 +105,20 @@ light {
 
 .t-username {
 	width: 100%;
+	font-weight: bold;
 }
 
 .t-content {
 	width: 100%;
+	margin: 0;
 }
 
 .t-timeline-stream {
 	padding: 0;
 	font-size: 12px;
 	margin: 0;
+}
+
+.t-right-top-button {
+	font-size: 10px !important;
 }
