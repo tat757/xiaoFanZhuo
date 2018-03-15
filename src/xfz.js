@@ -11,6 +11,8 @@ var XFZ = {
 		},
 		timeline: {
 			data: [],
+			unread: [],
+			unreadCount: 0,
 			cache: {},
 			count: 0,
 			first: '',
@@ -38,7 +40,6 @@ var XFZ = {
 		httpRequest.send();
 	},
 	Post : function(url, data, callback){
-		console.log(data);
 		httpRequest = new XMLHttpRequest();
 		httpRequest.open('POST', url, true);
 		data = JSON.stringify(data);
@@ -74,6 +75,36 @@ var XFZ = {
 		inputContainer.id = 'inputContainer';
 		inputContainer.classList.add('t-input-container');
 
+		var currUserAvatar = document.createElement('img');
+		currUserAvatar.id = 'currUserAvatar';
+		currUserAvatar.classList.add('t-avatar');
+		
+		var avatarBlock = document.createElement('div');
+		avatarBlock.id = 'avatarBlock';
+		avatarBlock.classList.add('t-avatar-block');
+		avatarBlock.appendChild(currUserAvatar);
+
+		var logoutButton = document.createElement('input');
+		logoutButton.id = 'logoutButton';
+		logoutButton.type = 'button';
+		logoutButton.value = 'x'; // TODO: replace with power image
+		logoutButton.classList.add('t-logout-button');
+		logoutButton.onclick = function (e) {
+			var target = e.target;
+			XFZ.status.page = 'logout';
+			XFZ.setPage();
+		};
+
+		var featureBlock = document.createElement('div');
+		featureBlock.id = 'featureBlock';
+		featureBlock.classList.add('t-feature-block');
+		featureBlock.appendChild(logoutButton);
+
+		var avatarContainer = document.createElement('div');
+		avatarContainer.classList.add('t-avatar-container');
+		avatarContainer.appendChild(avatarBlock);
+		avatarContainer.appendChild(featureBlock);
+
 		var textarea = document.createElement('textarea');
 		textarea.id = 'inputTextarea';
 		textarea.classList.add('t-input-textarea');
@@ -82,30 +113,18 @@ var XFZ = {
 		inputBox.classList.add('t-input');
 		inputBox.appendChild(textarea);
 
-		var currUserAvatar = document.createElement('img');
-		currUserAvatar.id = 'currUserAvatar';
-		currUserAvatar.classList.add('t-avatar');
-
-		var avatarContainer = document.createElement('div');
-		avatarContainer.classList.add('t-avatar-container');
-		avatarContainer.appendChild(currUserAvatar);
-
 		window.addEventListener('keyup', function (event) {
 			var inputTextarea = document.getElementById('inputTextarea');
 			var parameter = {}
-			if (event.defaultPrevented) {
-				return
-			}
 			if (event.key === 'Enter' && event.ctrlKey) {
-				console.log('pressed enter and control');
 				if (inputTextarea.value !== '') {
 					parameter.text = inputTextarea.value;
+					inputTextarea.value = '';
 					XFZ.Post('/action/postStatus', parameter, function(data){
 						inputTextarea.value = '';
 					});
 				}
 			}
-			event.preventDefault()
 		});
 		/*
 			logoutBt.addEventListener('click', function(e){
@@ -151,7 +170,6 @@ var XFZ = {
 		var timelineStream = document.getElementById('timelineStream');
 		timelineStream.classList.add('t-timeline-stream');
 
-		console.log(data[0]);
 		//for each data create a message block
 		var message, messageContainer;
 		var leftCell, userAvatarLink, userAvatar;
@@ -164,7 +182,7 @@ var XFZ = {
 			// A contianer for each message
 			messageContainer = document.createElement('li');
 			messageContainer.classList.add('t-message-container');
-			messageContainer.id = message.rawid;
+			messageContainer.id = message.id;
 			
 			// Left cell
 			leftCell = document.createElement('div');
@@ -218,22 +236,19 @@ var XFZ = {
 				reply.type = 'button'
 				reply.value = '回复';
 				reply.classList.add('t-right-top-button');
-				reply.dataset.messageRawid = message.rawid
+				reply.id = message.id;
 				reply.addEventListener('click', function(e){
 					var inputArea = document.getElementById('inputTextarea');
 					var atUserList = [];
 					var char;
 					inputArea.focus();
 					var item;
-					console.log(XFZ.status.timeline.data)
 					for (var i = XFZ.status.timeline.data.length - 1; i >= 0; i--) {
 						item = XFZ.status.timeline.data[i];
-						if (item.rawid === e.target.dataset.messageRawid) {
+						if (item.id === e.target.id) {
 							break;
 						}
 					}
-					console.log(item);
-					console.log(e.target.dataset.messageRawid);
 					//找到原消息中所有被@的用户
 					for(var i = 0; i < textArray.length; i++){
 						char = textArray[i].split('');
@@ -258,20 +273,20 @@ var XFZ = {
 				destroy.addEventListener('click', function(e){
 					XFZ.Post('/action/destroyStatus', {msgId : e.target.id}, function(data){
 						if(data.success){
-							var last
-							var element = document.getElementById(e.target.dataset.msgId).parentElement;
-							if(element.classList.contains('first')){
-								element.parentElement.firstChild.nextSibling.classList.add('first');
+							// If the message is the first message, replace the first id with the one at second place
+							if(XFZ.status.timeline.first === e.target.id){
+								XFZ.status.timeline.data.shift();
+								XFZ.status.timeline.first = XFZ.status.timeline.data[0].id;
 							}
-							element.outerHTML = '';
+							// remove data form cache
+							XFZ.status.timeline.cache[e.target.id] = null;
+							e.target.parentElement.parentElement.parentElement.outerHTML = '';
 						}
 					});
 				}, false);
 			}
 			if(hidden){
-				messageContainer.style.display = 'none';
 				timelineStream.insertBefore(messageContainer, document.getElementById(XFZ.status.timeline.first));
-				messageContainer.classList.add('unread');
 			} else {
 				timelineStream.appendChild(messageContainer);
 				XFZ.status.timeline.last = messageContainer.id;
@@ -301,19 +316,22 @@ var XFZ = {
 	* get new timeline based on the last message id
 	*/
 	checkNewTimeline : function(){
-		var item = XFZ.findItemByRawid(XFZ.status.timeline.first, XFZ.status.timeline.cache);
-		console.log('item is here');
-		console.log(item);
+		var firstId = XFZ.status.timeline.first;
 		var notification;
-		XFZ.Post('/action/checkNewTimeline', {firstId: item.id}, function(data){
+		XFZ.Post('/action/checkNewTimeline', {firstId: firstId}, function(data){
 			if(data.success){
 				if(data.data.length > 0){
+					// store the new data into unread array
+					for (var i = data.data.length - 1; i >= 0; i--) {
+						XFZ.status.timeline.unread.unshift(data.data[i]);
+						XFZ.status.timeline.unreadCount++;
+					}
 					notification = document.getElementById('timelineNotification');
 					// if the notification already here, plus new number to it
 					var result = XFZ.setCacheData(data.data, XFZ.status.timeline.cache, XFZ.status.timeline.data, true);
 					XFZ.setTimelineDataAndCache(XFZ.status.timeline, result.data, result.cache);
 					if(notification.innerHTML !== ''){
-						notification.firstChild.innerHTML = data.data.length + +notification.firstChild.innerHTML;
+						notification.firstChild.innerHTML = XFZ.status.timeline.unreadCount;
 					}
 					else{
 						var button = document.createElement('button');
@@ -326,15 +344,13 @@ var XFZ = {
 						XFZ.setStyle(button, buttonStyle);
 						notification.appendChild(button);
 						button.addEventListener('click', function(e){
-							var unread = document.getElementsByClassName('unread');
+							var timelineData = XFZ.status.timeline;
+							XFZ.setTimeline(timelineData.unread, true);
+							XFZ.status.timeline.unread = [];
+							XFZ.status.timeline.unreadCount = 0;
 							document.getElementById('timelineNotification').innerHTML = '';
-							for(var i = 0; i < unread.length; i++){
-								unread[i].style.display = 'block';
-								unread[i].classList.toggle('unread');
-							}
 						}, false);
 					}
-					XFZ.setTimeline(data.data, true);
 				}
 			}
 		});
@@ -386,11 +402,11 @@ var XFZ = {
 								var gap = top / (height - currHeight) * 100;
 								if(gap >= 70 && !XFZ.status.loadingContent){
 									XFZ.status.loadingContent = true;
-									var contentId = XFZ.findItemByRawid(XFZ.status.timeline.last, XFZ.status.timeline.cache);
+									var lastId = XFZ.status.timeline.last;
 									var loadingLi = document.createElement('li');
 									loadingLi.innerHTML = '载入中..';
 									document.getElementById('timelineStream').appendChild(loadingLi);
-									XFZ.Post('/action/getHomeTimelineBeforeLast', {contentId: contentId.id}, function(data){
+									XFZ.Post('/action/getHomeTimelineBeforeLast', {contentId: lastId}, function(data){
 										var parent = document.getElementById('timelineStream');
 										if(data.success){
 											var result = XFZ.setCacheData(data.data, XFZ.status.timeline.cache, XFZ.status.timeline.data, false);
@@ -502,8 +518,6 @@ var XFZ = {
 		var finalCache = cache ? JSON.parse(JSON.stringify(cache)) : {};
 		var finalData = items ? items.slice() : [];
 		var mode = fresh || true;
-		console.log('setCacheData');
-		console.log(data);
 		for (var i = data.length - 1; i >= 0; i--) {
 			if (fresh) {
 				finalData.unshift(data[i]);
@@ -511,15 +525,12 @@ var XFZ = {
 				finalData.push(data[i]);
 			}
 			// TODO: This may cause memory issue
-			finalCache[data[i].rawid] = data[i];
+			finalCache[data[i].id] = data[i];
 		}
 		return {
 			data: finalData,
 			cache: finalCache
 		};
-	},
-	findItemByRawid: function (rawid, cache) {
-		return cache[rawid];
 	}
 };
 XFZ.init();
