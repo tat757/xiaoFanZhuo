@@ -82,12 +82,11 @@ router.get('/logout', function(req, res){
 });
 
 router.post('/postStatus', function(req, res){
-	console.log(req.body);
+	console.log('/postStatus');
 	var data = {};
-	console.log(req.body.isReply);
-	if(req.body.isReply == true || req.body.isReply == 'true'){
+	if(req.body.isReply){
 		data.isReply = true;
-		data.replyId = req.body.replyId;
+		data.replyToUser = req.body.replyToUser;
 		data.replyToId = req.body.replyToId;
 		data.text = req.body.text;
 	}
@@ -96,9 +95,6 @@ router.post('/postStatus', function(req, res){
 	}
 	fanfou.access_token = config.get('access_token');
 	fanfou.access_token_secret = config.get('access_token_secret');
-	console.log('data : ================================================');
-	console.log(data);
-	console.log('==============================');
 	fanfou.postStatus(
 		data,
 		function(error, result, body){
@@ -112,6 +108,7 @@ router.post('/postStatus', function(req, res){
 });
 
 router.post('/destroyStatus', function(req, res){
+	console.log('/destroyStatus');
 	if(req.body.msgId == undefined){
 		return res.json({success: false});
 	}
@@ -119,9 +116,6 @@ router.post('/destroyStatus', function(req, res){
 		var data = req.body;
 		fanfou.access_token = config.get('access_token');
 		fanfou.access_token_secret = config.get('access_token_secret');
-		console.log('data : ================================================');
-		console.log(data);
-		console.log('==============================');
 		fanfou.destroyStatus(
 			data,
 			function(error, result, body){
@@ -137,7 +131,6 @@ router.post('/destroyStatus', function(req, res){
 });
 
 router.post('/getHomeTimelineBeforeLast', function(req, res){
-	console.log('/getHomeTimelineBeforeLast');
 	var id = req.body.contentId;
 	fanfou.access_token = config.get('access_token');
 	fanfou.access_token_secret = config.get('access_token_secret');

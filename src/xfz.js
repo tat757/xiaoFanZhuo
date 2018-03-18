@@ -7,7 +7,10 @@ var XFZ = {
 			unique_id : ''
 		},
 		input: {
-			message: ''
+			isReply: true,
+			replyToId: '',
+			replyToUser: '',
+			replyToUsername: ''
 		},
 		timeline: {
 			data: [],
@@ -25,7 +28,7 @@ var XFZ = {
 	init : function(){
 		document.body.style.overflowY = 'hidden';
 		XFZ.status.page = 'welcome';
-		XFZ.setPage();
+		XFZ.renderPage();
 	},
 	Get : function(url, callback){
 		httpRequest = new XMLHttpRequest();
@@ -54,7 +57,7 @@ var XFZ = {
 		};
 		httpRequest.send(data);
 	},
-	setPage : function(){
+	renderPage : function(){
 		switch(XFZ.status.page){
 			case 'welcome' : 
 				XFZ.page.welcome();
@@ -70,7 +73,7 @@ var XFZ = {
 				break;
 		}
 	},
-	setInput : function(){
+	renderInput : function(){
 		var inputContainer = document.createElement('div');
 		inputContainer.id = 'inputContainer';
 		inputContainer.classList.add('t-input-container');
@@ -92,7 +95,7 @@ var XFZ = {
 		logoutButton.onclick = function (e) {
 			var target = e.target;
 			XFZ.status.page = 'logout';
-			XFZ.setPage();
+			XFZ.renderPage();
 		};
 
 		var featureBlock = document.createElement('div');
@@ -120,6 +123,21 @@ var XFZ = {
 				if (inputTextarea.value !== '') {
 					parameter.text = inputTextarea.value;
 					inputTextarea.value = '';
+					if (XFZ.status.input.isReply) {
+						var array = parameter.text.split(' ');
+						var stillReplying = false;
+						for (var i = array.length - 1; i >= 0; i--) {
+							if (array[i] === '@' + XFZ.status.input.replyToUsername) {
+								stillReplying = true;
+								break;
+							}
+						}
+						if (stillReplying) {
+							parameter.isReply = true;
+							parameter.replyToId = XFZ.status.input.replyToId;
+							parameter.replyToUser = XFZ.status.input.replyToUser;
+						}
+					}
 					XFZ.Post('/action/postStatus', parameter, function(data){
 						inputTextarea.value = '';
 					});
@@ -130,7 +148,7 @@ var XFZ = {
 			logoutBt.addEventListener('click', function(e){
 					var target = e.target;
 					XFZ.status.page = 'logout';
-					XFZ.setPage();
+					XFZ.renderPage();
 				}, false);
 			console.log('here')
 			postBt.addEventListener('click', function(e){
@@ -166,7 +184,7 @@ var XFZ = {
 	/*
 	 *Setup the timeline
 	 */
-	setTimeline : function(data, hidden){
+	renderTimeline : function(data, hidden){
 		var timelineStream = document.getElementById('timelineStream');
 		timelineStream.classList.add('t-timeline-stream');
 
@@ -241,25 +259,11 @@ var XFZ = {
 					var inputArea = document.getElementById('inputTextarea');
 					var atUserList = [];
 					var char;
+					var item = XFZ.status.timeline.cache[e.target.id];
 					inputArea.focus();
-					var item;
-					for (var i = XFZ.status.timeline.data.length - 1; i >= 0; i--) {
-						item = XFZ.status.timeline.data[i];
-						if (item.id === e.target.id) {
-							break;
-						}
-					}
 					//找到原消息中所有被@的用户
-					for(var i = 0; i < textArray.length; i++){
-						char = textArray[i].split('');
-						if(char[0] === '@'){
-							atUserList.push(textArray[i]);
-						}
-					}
-					inputArea.value = '@' + e.target.dataset.replyToName + ' ';
-					for(var i = 0; i < atUserList.length; i++){
-						inputArea.value += atUserList + ' ';
-					}
+					inputArea.value = '@' + item.user.name + ' ';
+					XFZ.setInputData('reply', item);
 				}, false);
 			}
 			else{
@@ -296,7 +300,7 @@ var XFZ = {
 			}
 		}
 	},
-	setBody : function(){
+	renderBody : function(){
 		switch(XFZ.status.nav){
 			case 'timeline' : 
 				XFZ.body.timeline();
@@ -310,6 +314,14 @@ var XFZ = {
 			case 'favorite' :
 				XFZ.body.favorite();
 				break;
+		}
+	},
+	setInputData: function (type, item) {
+		if (type === 'reply') {
+			XFZ.status.input.isReply = true;
+			XFZ.status.input.replyToId = item.id;
+			XFZ.status.input.replyToUser = item.user.id;
+			XFZ.status.input.replyToUsername = item.user.name;
 		}
 	},
 	/*
@@ -345,7 +357,7 @@ var XFZ = {
 						notification.appendChild(button);
 						button.addEventListener('click', function(e){
 							var timelineData = XFZ.status.timeline;
-							XFZ.setTimeline(timelineData.unread, true);
+							XFZ.renderTimeline(timelineData.unread, true);
 							XFZ.status.timeline.unread = [];
 							XFZ.status.timeline.unreadCount = 0;
 							document.getElementById('timelineNotification').innerHTML = '';
@@ -392,8 +404,10 @@ var XFZ = {
 						bodyContainer.innerHTML = '';
 						bodyContainer.appendChild(timeline);
 						XFZ.status.timeline.data = data.data;
-						XFZ.setTimeline(data.data);
+						XFZ.renderTimeline(data.data);
 						if(data.data.length >= 10){
+							/* When use scroll mouse to the last 30% of the page,
+							 * request more message based on the last id. */
 							timeline.addEventListener('scroll', function(e){
 								var target = e.target;
 								var top = target.scrollTop;
@@ -412,7 +426,7 @@ var XFZ = {
 											var result = XFZ.setCacheData(data.data, XFZ.status.timeline.cache, XFZ.status.timeline.data, false);
 											XFZ.setTimelineDataAndCache(XFZ.status.timeline, result.data, result.cache);
 											parent.removeChild(parent.lastChild);
-											XFZ.setTimeline(data.data);
+											XFZ.renderTimeline(data.data);
 											XFZ.status.loadingContent = false;
 										}
 									});
@@ -450,7 +464,7 @@ var XFZ = {
 				}
 				else{
 					XFZ.status.page = 'main';
-					XFZ.setPage();
+					XFZ.renderPage();
 				}
 			});
 		},
@@ -495,7 +509,7 @@ var XFZ = {
 
 			XFZ.Get('/action/getCurrUser', function(data){
 				if(data.success){
-					var inputContainer = XFZ.setInput();
+					var inputContainer = XFZ.renderInput();
 					XFZ.status.currUser = data.data;
 					container.innerHTML = '';
 					XFZ.appendChilds(div, [inputContainer, navBarContainer, bodyContainer]);
@@ -504,7 +518,7 @@ var XFZ = {
 					document.getElementById('currUserAvatar').src = XFZ.status.currUser.profile_image_url;
 					XFZ.status.nav = 'timeline';
 					XFZ.status.notCurrUser = false;
-					XFZ.setBody();
+					XFZ.renderBody();
 				}
 			});
 
