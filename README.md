@@ -7,7 +7,8 @@
 * 登出 Logout
 
 2. 发布 Posting
-* 发布文字信息 Posting message
+* 转发文字信息 Repost message
+* 发布文字信息 Post message
 * 回复信息 Reply message
 * 删除信息 Destroy message
 
@@ -15,3 +16,4 @@
 * 载入时获取主页时间轴 Pulling home timeline when loading
 * 当用户快阅读完当前所有时间轴时,载入更多时间轴 Pulling more timeline when user nearly read all of the timeline
 * 每10秒检测时间轴更新 Checking the update of timeline every 10 seconds
+* 显示信息中的照片 Showing the photo within a message
