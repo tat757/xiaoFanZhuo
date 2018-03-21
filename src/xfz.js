@@ -185,13 +185,14 @@ var XFZ = {
 	 *Setup the timeline
 	 */
 	renderTimeline : function(data, hidden){
+		console.log(data);
 		var timelineStream = document.getElementById('timelineStream');
 		timelineStream.classList.add('t-timeline-stream');
 
 		//for each data create a message block
 		var message, messageContainer;
 		var leftCell, userAvatarLink, userAvatar;
-		var middleCell, middleTop, content;
+		var middleCell, middleTop, content, contentContainer, photo;
 		var rightCell, rightTop, rightMiddle, rightBottom;
 		var reply, destroy;
 		for(var i = 0; i < data.length; i++){
@@ -223,11 +224,24 @@ var XFZ = {
 			middleTop.appendChild(username);
 			middleCell.appendChild(middleTop);
 
-			content = document.createElement('p');
-			content.classList.add('t-content')
-			content.innerHTML = message.text;
-			middleCell.appendChild(content);
-
+			contentContainer = document.createElement('div');
+			contentContainer.classList.add('t-middle-bottom-cell');
+			content = document.createElement('span');
+			contentContainer.appendChild(content);
+			if (message.photo) {
+				content.classList.add('t-content-with-photo');
+				var photoContainer = document.createElement('a');
+				photoContainer.classList.add('t-content-photo-container');
+				var photo = new Image();
+				photo.classList.add('t-content-photo');
+				photo.src = message.photo.thumburl;
+				photoContainer.appendChild(photo);
+				content.appendChild(photoContainer);
+			} else {
+				content.classList.add('t-content');
+			}
+			content.innerHTML += message.text;
+			middleCell.appendChild(contentContainer);
 			messageContainer.appendChild(middleCell);
 			
 			// Right cell
