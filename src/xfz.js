@@ -10,7 +10,9 @@ var XFZ = {
 			isReply: true,
 			replyToId: '',
 			replyToUser: '',
-			replyToUsername: ''
+			replyToUsername: '',
+			isRepost: true,
+			repostToId: ''
 		},
 		timeline: {
 			data: [],
@@ -137,6 +139,9 @@ var XFZ = {
 							parameter.replyToId = XFZ.status.input.replyToId;
 							parameter.replyToUser = XFZ.status.input.replyToUser;
 						}
+					} else if (XFZ.status.input.isRepost) {
+						parameter.isRepost = true;
+						parameter.repostToId = XFZ.status.input.repostToId;
 					}
 					XFZ.Post('/action/postStatus', parameter, function(data){
 						inputTextarea.value = '';
@@ -233,7 +238,6 @@ var XFZ = {
 				var photoContainer = document.createElement('a');
 				photoContainer.classList.add('t-content-photo-container');
 				var photo = new Image();
-				photo.classList.add('t-content-photo');
 				photo.src = message.photo.thumburl;
 				photoContainer.appendChild(photo);
 				content.appendChild(photoContainer);
@@ -255,6 +259,22 @@ var XFZ = {
 			rightMiddle = document.createElement('div');
 			rightMiddle.classList.add('t-right-child-cell');
 			rightCell.appendChild(rightMiddle);
+			var repost = document.createElement('input');
+			rightMiddle.appendChild(repost);
+			repost.classList.add('t-right-button');
+			repost.type = 'button';
+			repost.value = '转发';
+			repost.dataset.id = message.id;
+			repost.onclick = function (e) {
+				var inputArea = document.getElementById('inputTextarea');
+				var atUserList = [];
+				var char;
+				var item = XFZ.status.timeline.cache[e.target.dataset.id];
+				inputArea.focus();
+				inputArea.value = '转@' + item.user.name + ' ' + item.text;
+				inputArea.setSelectionRange(0, 0);
+				XFZ.setInputData('repost', item);
+			}
 			
 			rightBottom = document.createElement('div');
 			rightBottom.classList.add('t-right-child-cell');
@@ -267,13 +287,13 @@ var XFZ = {
 				rightTop.appendChild(reply);
 				reply.type = 'button'
 				reply.value = '回复';
-				reply.classList.add('t-right-top-button');
-				reply.id = message.id;
+				reply.classList.add('t-right-button');
+				reply.dataset.id = message.id;
 				reply.addEventListener('click', function(e){
 					var inputArea = document.getElementById('inputTextarea');
 					var atUserList = [];
 					var char;
-					var item = XFZ.status.timeline.cache[e.target.id];
+					var item = XFZ.status.timeline.cache[e.target.dataset.id];
 					inputArea.focus();
 					//找到原消息中所有被@的用户
 					inputArea.value = '@' + item.user.name + ' ';
@@ -287,17 +307,17 @@ var XFZ = {
 				destroy.type = 'button'
 				destroy.value = '删除';
 				destroy.id = message.id;
-				destroy.classList.add('t-right-top-button');
+				destroy.classList.add('t-right-button');
 				destroy.addEventListener('click', function(e){
-					XFZ.Post('/action/destroyStatus', {msgId : e.target.id}, function(data){
+					XFZ.Post('/action/destroyStatus', {msgId : e.target.dataset.id}, function(data){
 						if(data.success){
 							// If the message is the first message, replace the first id with the one at second place
-							if(XFZ.status.timeline.first === e.target.id){
+							if(XFZ.status.timeline.first === e.target.dataset.id){
 								XFZ.status.timeline.data.shift();
 								XFZ.status.timeline.first = XFZ.status.timeline.data[0].id;
 							}
 							// remove data form cache
-							XFZ.status.timeline.cache[e.target.id] = null;
+							XFZ.status.timeline.cache[e.target.dataset.id] = null;
 							e.target.parentElement.parentElement.parentElement.outerHTML = '';
 						}
 					});
@@ -336,6 +356,13 @@ var XFZ = {
 			XFZ.status.input.replyToId = item.id;
 			XFZ.status.input.replyToUser = item.user.id;
 			XFZ.status.input.replyToUsername = item.user.name;
+		} else if (type === 'repost') {
+			XFZ.status.input.isRepost = true;
+			if (item.repost_status_id) {
+				XFZ.status.input.repostToId = item.repost_status_id;
+			} else {
+				XFZ.status.input.repostToId = item.id;
+			}
 		}
 	},
 	/*
@@ -520,7 +547,6 @@ var XFZ = {
 			bodyContainer.id = 'bodyContainer';
 			var timeline = document.createElement('div');
 			
-
 			XFZ.Get('/action/getCurrUser', function(data){
 				if(data.success){
 					var inputContainer = XFZ.renderInput();
@@ -535,7 +561,6 @@ var XFZ = {
 					XFZ.renderBody();
 				}
 			});
-
 		},
 	},
 	setTimelineDataAndCache: function (timeline, data, cache) {

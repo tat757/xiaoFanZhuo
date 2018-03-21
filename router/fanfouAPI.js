@@ -84,8 +84,12 @@ FanfouAPI.prototype.postStatus = function(data, err, res){
 		parameter = {"status" : data.text,
 					 "in_reply_to_status_id" : data.replyToId,
 					 "in_reply_to_user_id" : data.replyToUser};
-	}
-	else{
+	} else if (data.isRepost) {
+		parameter = {
+			"status": data.text,
+			"repost_status_id": data.repostToId
+		};
+	} else {
 		parameter = {"status": data.text };
 	}
 	var url = this.apiBaseURL + path;

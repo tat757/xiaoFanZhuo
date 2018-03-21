@@ -89,8 +89,11 @@ router.post('/postStatus', function(req, res){
 		data.replyToUser = req.body.replyToUser;
 		data.replyToId = req.body.replyToId;
 		data.text = req.body.text;
-	}
-	else{
+	} else if (req.body.isRepost) {
+		data.isRepost = true;
+		data.repostToId = req.body.repostToId;
+		data.text = req.body.text;
+	} else {
 		data.text = req.body.text;
 	}
 	fanfou.access_token = config.get('access_token');
