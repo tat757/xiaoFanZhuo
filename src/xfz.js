@@ -1,5 +1,27 @@
+const BrowserWindow = require('electron').remote.BrowserWindow;
 var container = document.getElementById('container');
 var httpRequest = new XMLHttpRequest();
+
+// this event is used to show large image when user clicks an image in a message
+window.addEventListener('click', function (e) {
+	if (e.target.nodeName === 'IMG' && e.target.dataset.largeurl) {
+		let largePhoto = new Image();
+		largePhoto.onload = function () {
+			let win = new BrowserWindow({
+				width: largePhoto.width,
+				height: largePhoto.height,
+				autoHideMenuBar: true,
+				backgroundColor: 'white'
+			});
+			win.on('close', function () {
+				win = null;
+			});
+			win.loadURL(largePhoto.src);
+		};
+		largePhoto.src = e.target.dataset.largeurl;
+	}
+});
+
 var XFZ = {
 	status : {
 		page : 'welcome',
@@ -234,11 +256,12 @@ var XFZ = {
 			content = document.createElement('span');
 			contentContainer.appendChild(content);
 			if (message.photo) {
-				content.classList.add('t-content-with-photo');
 				var photoContainer = document.createElement('a');
-				photoContainer.classList.add('t-content-photo-container');
 				var photo = new Image();
+				content.classList.add('t-content-with-photo');
+				photoContainer.classList.add('t-content-photo-container');
 				photo.src = message.photo.thumburl;
+				photo.dataset.largeurl = message.photo.largeurl;
 				photoContainer.appendChild(photo);
 				content.appendChild(photoContainer);
 			} else {
