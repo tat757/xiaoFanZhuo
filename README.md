@@ -17,3 +17,4 @@
 * 当用户快阅读完当前所有时间轴时,载入更多时间轴 Pulling more timeline when user nearly read all of the timeline
 * 每10秒检测时间轴更新 Checking the update of timeline every 10 seconds
 * 显示信息中的照片 Showing the photo within a message
+* 点击查看放大图片 Showing large photo when user click an image in a message

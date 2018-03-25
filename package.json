@@ -1,6 +1,6 @@
 {
   "name": "xiaoFanZhuo",
-  "version": "0.5.3",
+  "version": "0.5.7",
   "main": "app.js",
   "dependencies": {
     "body-parser": "^1.17.1",

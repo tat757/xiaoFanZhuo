@@ -1,3 +1,8 @@
+0.5.7
+-添加转发功能 | Added repost feature
+-添加显示时间轴中图片的功能 | Added feature that showing image in timeline message
+-添加点击图片查看放大图片功能 | Added feature that showing large image if user click an image in a message
+
 0.5.6
 -添加删除信息功能 | Added destroy message feature
 
