@@ -29,11 +29,12 @@ var XFZ = {
 			unique_id : ''
 		},
 		input: {
-			isReply: true,
+			inputing: false,
+			isReply: false,
 			replyToId: '',
 			replyToUser: '',
 			replyToUsername: '',
-			isRepost: true,
+			isRepost: false,
 			repostToId: ''
 		},
 		timeline: {
@@ -135,6 +136,29 @@ var XFZ = {
 		var textarea = document.createElement('textarea');
 		textarea.id = 'inputTextarea';
 		textarea.classList.add('t-input-textarea');
+
+		textarea.addEventListener('focus', function (e) {
+			XFZ.status.input.inputing = true;
+		});
+
+		textarea.addEventListener('input', function (e) {
+			var inputTextarea = document.getElementById('inputTextarea');
+			if (inputTextarea.value === '') {
+				XFZ.status.input = {
+					inputing: false,
+					isReply: false,
+					replyToId: '',
+					replyToUser: '',
+					replyToUsername: '',
+					isRepost: false,
+					repostToId: ''
+				};
+			} else {
+				XFZ.status.input.inputing = true;
+			}
+		});
+
+		
 
 		var inputBox = document.createElement('div');
 		inputBox.classList.add('t-input');
