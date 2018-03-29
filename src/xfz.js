@@ -35,7 +35,8 @@ var XFZ = {
 			replyToUser: '',
 			replyToUsername: '',
 			isRepost: false,
-			repostToId: ''
+			repostToId: '',
+			image: null
 		},
 		timeline: {
 			data: [],
@@ -139,6 +140,10 @@ var XFZ = {
 
 		textarea.addEventListener('focus', function (e) {
 			XFZ.status.input.inputing = true;
+			var uploadImage = document.getElementById('uploadImage');
+			if (uploadImage.classList.contains('t-hidden')) {
+				uploadImage.classList.toggle('t-hidden');
+			}
 		});
 
 		textarea.addEventListener('input', function (e) {
@@ -157,12 +162,63 @@ var XFZ = {
 				XFZ.status.input.inputing = true;
 			}
 		});
+		var uploadContainer = document.createElement('span');
 
-		
+		var uploadImage = document.createElement('input');
+		uploadImage.type = 'button';
+		uploadImage.value = '上传图片';
+		uploadImage.id = 'uploadImage';
+		uploadImage.classList.add('t-right-button');
+		uploadImage.classList.add('t-hidden');
+		uploadImage.addEventListener('click', function () {
+			document.getElementById('realUploadButton').click();
+		});
+		uploadContainer.appendChild(uploadImage);
+
+		var imageNameContainer = document.createElement('div');
+		imageNameContainer.id = 'imageNameContainer';
+		imageNameContainer.classList.add('t-hidden');
+		var imageName = document.createElement('span');
+		imageName.id = 'imageName';
+		imageName.classList.add('t-sm-font');
+		imageName.innerHTML = '';
+		var imageCloseButton = document.createElement('span');
+		imageCloseButton.innerHTML = 'X';
+		imageCloseButton.classList.add('t-sm-font');
+		imageCloseButton.classList.add('t-ml-5');
+		imageCloseButton.classList.add('t-hover');
+		imageCloseButton.classList.add('t-pointer');
+		imageNameContainer.appendChild(imageName);
+		imageNameContainer.appendChild(imageCloseButton);
+		uploadContainer.appendChild(imageNameContainer);
+
+		var realUploadButton = document.createElement('input');
+		realUploadButton.type = 'file';
+		realUploadButton.classList.add('t-hidden');
+		realUploadButton.id = 'realUploadButton';
+		realUploadButton.addEventListener('change', function (e) {
+			var image = e.target.files[0];
+			if (image) {
+				document.getElementById('imageName').innerHTML = image.name;
+				var imageNameContainer = document.getElementById('imageNameContainer');
+				if (imageNameContainer.classList.contains('t-hidden')) {
+					imageNameContainer.classList.toggle('t-hidden');
+				}
+			}
+			var reader = new FileReader();
+			console.log(image);
+			reader.onload = function (event) {
+				XFZ.status.input.image = event.target.result;
+				console.log(event.target);
+			};
+			reader.readAsDataURL(image);
+		})
+		uploadContainer.appendChild(realUploadButton);
 
 		var inputBox = document.createElement('div');
 		inputBox.classList.add('t-input');
 		inputBox.appendChild(textarea);
+		inputBox.appendChild(uploadContainer);
 
 		window.addEventListener('keyup', function (event) {
 			var inputTextarea = document.getElementById('inputTextarea');

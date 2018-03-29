@@ -35,7 +35,7 @@ body {
 
 .t-input-textarea {
 	width: 100%;
-	height: 100%;
+	height: 60px;
 	resize: none;
 	padding: 0;
 }
@@ -49,7 +49,7 @@ body {
 	display: grid;
 	grid-template-columns: 42px auto;
 	grid-gap: 5px;
-	height: 65px;
+	min-height: 65px;
 	margin-right: 5px;
 	margin-bottom: 5px;
 }
@@ -154,4 +154,24 @@ body {
 
 .t-right-button {
 	font-size: 10px !important;
+}
+
+.t-sm-font {
+	font-size: 12px;
+}
+
+.t-hidden {
+	display: none;
+}
+
+.t-ml-5 {
+	margin-left: 5px;
+}
+
+.t-hover:hover {
+	background: #bbdefb;
+}
+
+.t-pointer {
+	cursor: pointer;
 }
