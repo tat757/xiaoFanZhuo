@@ -175,3 +175,12 @@ body {
 .t-pointer {
 	cursor: pointer;
 }
+
+.t-fl {
+	float: left;
+}
+
+.t-sm-container {
+	font-size: 12px;
+	margin: 0;
+}

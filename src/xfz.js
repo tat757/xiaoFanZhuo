@@ -36,7 +36,8 @@ var XFZ = {
 			replyToUsername: '',
 			isRepost: false,
 			repostToId: '',
-			image: null
+			image: null,
+			hasImage: false
 		},
 		timeline: {
 			data: [],
@@ -149,45 +150,46 @@ var XFZ = {
 		textarea.addEventListener('input', function (e) {
 			var inputTextarea = document.getElementById('inputTextarea');
 			if (inputTextarea.value === '') {
-				XFZ.status.input = {
-					inputing: false,
-					isReply: false,
-					replyToId: '',
-					replyToUser: '',
-					replyToUsername: '',
-					isRepost: false,
-					repostToId: ''
-				};
+				XFZ.resetInput();
 			} else {
 				XFZ.status.input.inputing = true;
 			}
 		});
-		var uploadContainer = document.createElement('span');
-
+		var uploadContainer = document.createElement('div');
+		
 		var uploadImage = document.createElement('input');
 		uploadImage.type = 'button';
 		uploadImage.value = '上传图片';
 		uploadImage.id = 'uploadImage';
 		uploadImage.classList.add('t-right-button');
 		uploadImage.classList.add('t-hidden');
+		uploadImage.classList.add('t-fl');
 		uploadImage.addEventListener('click', function () {
 			document.getElementById('realUploadButton').click();
 		});
 		uploadContainer.appendChild(uploadImage);
 
-		var imageNameContainer = document.createElement('div');
+		var imageNameContainer = document.createElement('p');
 		imageNameContainer.id = 'imageNameContainer';
 		imageNameContainer.classList.add('t-hidden');
+		imageNameContainer.classList.add('t-sm-container');
+		imageNameContainer.classList.add('t-fl');
 		var imageName = document.createElement('span');
 		imageName.id = 'imageName';
-		imageName.classList.add('t-sm-font');
+		imageName.classList.add('t-ml-5');
 		imageName.innerHTML = '';
 		var imageCloseButton = document.createElement('span');
 		imageCloseButton.innerHTML = 'X';
-		imageCloseButton.classList.add('t-sm-font');
 		imageCloseButton.classList.add('t-ml-5');
 		imageCloseButton.classList.add('t-hover');
 		imageCloseButton.classList.add('t-pointer');
+		imageCloseButton.addEventListener('click', function (e) {
+			imageName.innerHTML = '';
+			document.getElementById('imageNameContainer').classList.toggle('t-hidden');
+			document.getElementById('realUploadButton').value = null;
+			XFZ.status.input.hasImage = false;
+			XFZ.status.input.image = null;
+		});
 		imageNameContainer.appendChild(imageName);
 		imageNameContainer.appendChild(imageCloseButton);
 		uploadContainer.appendChild(imageNameContainer);
@@ -197,6 +199,7 @@ var XFZ = {
 		realUploadButton.classList.add('t-hidden');
 		realUploadButton.id = 'realUploadButton';
 		realUploadButton.addEventListener('change', function (e) {
+			console.log('changed');
 			var image = e.target.files[0];
 			if (image) {
 				document.getElementById('imageName').innerHTML = image.name;
@@ -206,10 +209,9 @@ var XFZ = {
 				}
 			}
 			var reader = new FileReader();
-			console.log(image);
 			reader.onload = function (event) {
 				XFZ.status.input.image = event.target.result;
-				console.log(event.target);
+				XFZ.status.input.hasImage = true;
 			};
 			reader.readAsDataURL(image);
 		})
@@ -686,6 +688,17 @@ var XFZ = {
 		return {
 			data: finalData,
 			cache: finalCache
+		};
+	},
+	resetInput: function () {
+		XFZ.status.input = {
+			inputing: false,
+			isReply: false,
+			replyToId: '',
+			replyToUser: '',
+			replyToUsername: '',
+			isRepost: false,
+			repostToId: ''
 		};
 	}
 };
