@@ -29,7 +29,6 @@ var XFZ = {
 			unique_id : ''
 		},
 		input: {
-			inputing: false,
 			isReply: false,
 			replyToId: '',
 			replyToUser: '',
@@ -140,7 +139,6 @@ var XFZ = {
 		textarea.classList.add('t-input-textarea');
 
 		textarea.addEventListener('focus', function (e) {
-			XFZ.status.input.inputing = true;
 			var uploadImage = document.getElementById('uploadImage');
 			if (uploadImage.classList.contains('t-hidden')) {
 				uploadImage.classList.toggle('t-hidden');
@@ -151,8 +149,6 @@ var XFZ = {
 			var inputTextarea = document.getElementById('inputTextarea');
 			if (inputTextarea.value === '') {
 				XFZ.resetInput();
-			} else {
-				XFZ.status.input.inputing = true;
 			}
 		});
 		var uploadContainer = document.createElement('div');
@@ -207,13 +203,10 @@ var XFZ = {
 				if (imageNameContainer.classList.contains('t-hidden')) {
 					imageNameContainer.classList.toggle('t-hidden');
 				}
-			}
-			var reader = new FileReader();
-			reader.onload = function (event) {
-				XFZ.status.input.image = event.target.result;
+				console.log(image);
+				XFZ.status.input.image = image.path;
 				XFZ.status.input.hasImage = true;
-			};
-			reader.readAsDataURL(image);
+			}
 		})
 		uploadContainer.appendChild(realUploadButton);
 
@@ -246,9 +239,14 @@ var XFZ = {
 					} else if (XFZ.status.input.isRepost) {
 						parameter.isRepost = true;
 						parameter.repostToId = XFZ.status.input.repostToId;
+					} else if (XFZ.status.input.hasImage) {
+						parameter.hasImage = true;
+						parameter.image = XFZ.status.input.image;
+						console.log(parameter.image);
 					}
 					XFZ.Post('/action/postStatus', parameter, function(data){
 						inputTextarea.value = '';
+						XFZ.resetInput(true);
 					});
 				}
 			}
@@ -411,10 +409,11 @@ var XFZ = {
 				//当发布信息的用户是自己的话,回复键改为删除键
 				destroy.type = 'button'
 				destroy.value = '删除';
-				destroy.id = message.id;
 				destroy.classList.add('t-right-button');
+				destroy.dataset.id = message.id;
 				destroy.addEventListener('click', function(e){
 					XFZ.Post('/action/destroyStatus', {msgId : e.target.dataset.id}, function(data){
+						console.log(data);
 						if(data.success){
 							// If the message is the first message, replace the first id with the one at second place
 							if(XFZ.status.timeline.first === e.target.dataset.id){
@@ -475,7 +474,6 @@ var XFZ = {
 	*/
 	checkNewTimeline : function(){
 		var firstId = XFZ.status.timeline.first;
-		var notification;
 		XFZ.Post('/action/checkNewTimeline', {firstId: firstId}, function(data){
 			if(data.success){
 				if(data.data.length > 0){
@@ -483,11 +481,14 @@ var XFZ = {
 					for (var i = data.data.length - 1; i >= 0; i--) {
 						XFZ.status.timeline.unread.unshift(data.data[i]);
 						XFZ.status.timeline.unreadCount++;
+						XFZ.status.timeline.first = XFZ.status.timeline.unread[0].id;
 					}
-					notification = document.getElementById('timelineNotification');
+					
+					var notification = document.getElementById('timelineNotification');
 					// if the notification already here, plus new number to it
 					var result = XFZ.setCacheData(data.data, XFZ.status.timeline.cache, XFZ.status.timeline.data, true);
 					XFZ.setTimelineDataAndCache(XFZ.status.timeline, result.data, result.cache);
+
 					if(notification.innerHTML !== ''){
 						notification.firstChild.innerHTML = XFZ.status.timeline.unreadCount;
 					}
@@ -690,16 +691,17 @@ var XFZ = {
 			cache: finalCache
 		};
 	},
-	resetInput: function () {
-		XFZ.status.input = {
-			inputing: false,
-			isReply: false,
-			replyToId: '',
-			replyToUser: '',
-			replyToUsername: '',
-			isRepost: false,
-			repostToId: ''
-		};
+	resetInput: function (full) {
+		XFZ.status.input.isReply = false;
+		XFZ.status.input.replyToId = '';
+		XFZ.status.input.replyToUser = '';
+		XFZ.status.input.replyToUsername = '';
+		XFZ.status.input.isRepost = false;
+		XFZ.status.input.repostToId = '';
+		if (full) {
+			XFZ.status.input.hasImage = false;
+			XFZ.status.input.image = null;
+		}
 	}
 };
 XFZ.init();

@@ -84,20 +84,20 @@ router.get('/logout', function(req, res){
 router.post('/postStatus', function(req, res){
 	console.log('/postStatus');
 	var data = {};
+	data.text = req.body.text;
+	fanfou.access_token = config.get('access_token');
+	fanfou.access_token_secret = config.get('access_token_secret');
 	if(req.body.isReply){
 		data.isReply = true;
 		data.replyToUser = req.body.replyToUser;
 		data.replyToId = req.body.replyToId;
-		data.text = req.body.text;
 	} else if (req.body.isRepost) {
 		data.isRepost = true;
 		data.repostToId = req.body.repostToId;
-		data.text = req.body.text;
-	} else {
-		data.text = req.body.text;
+	} else if (req.body.hasImage) {
+		data.hasImage = true;
+		data.image = req.body.image;
 	}
-	fanfou.access_token = config.get('access_token');
-	fanfou.access_token_secret = config.get('access_token_secret');
 	fanfou.postStatus(
 		data,
 		function(error, result, body){

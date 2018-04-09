@@ -1,5 +1,7 @@
 var OAuth = require('oauth');
 var CONFIG = require('../config');
+var request = require('request');
+var fs = require('fs');
 var FANFOU_URL = {
 	REQUEST_TOKEN_URL: 'http://fanfou.com/oauth/request_token',
 	ACCESS_TOKEN_URL: 'http://fanfou.com/oauth/access_token',
@@ -79,22 +81,34 @@ FanfouAPI.prototype.getCurrUser = function(err, res){
 
 FanfouAPI.prototype.postStatus = function(data, err, res){
 	var path = '/statuses/update.json';
-	var parameter;
-	if(data.isReply){
-		parameter = {"status" : data.text,
-					 "in_reply_to_status_id" : data.replyToId,
-					 "in_reply_to_user_id" : data.replyToUser};
-	} else if (data.isRepost) {
+	var parameter = {};
+	var url = '';
+	if (data.hasImage) {
+		path = '/photos/upload.json'
 		parameter = {
-			"status": data.text,
-			"repost_status_id": data.repostToId
-		};
+			photo: fs.createReadStream(data.image),
+			status: data.text
+		}
+		url = this.apiBaseURL + path;
+		this.uploadRequest(url, parameter, err, res);
 	} else {
-		parameter = {"status": data.text };
+		if(data.isReply){
+			parameter = {"status" : data.text,
+						 "in_reply_to_status_id" : data.replyToId,
+						 "in_reply_to_user_id" : data.replyToUser};
+		} else if (data.isRepost) {
+			parameter = {
+				"status": data.text,
+				"repost_status_id": data.repostToId
+			};
+		} else {
+			parameter = {"status": data.text };
+		}
+		url = this.apiBaseURL + path;
+		this.postRequest(url, parameter, err, res);
 	}
-	var url = this.apiBaseURL + path;
-	this.postRequest(url, parameter, err, res);
 };
+
 
 FanfouAPI.prototype.destroyStatus = function(data, err, res){
 	var path = '/statuses/destroy.json';
@@ -136,6 +150,36 @@ FanfouAPI.prototype.postRequest = function(url, data, err, res){
 			err(error, result, body);
 		}
 	});
+};
+
+FanfouAPI.prototype.uploadRequest = function (url, data, err, res) {
+	var that = this;
+	var oauth = {
+		consumer_key: this.consumerKey,
+		consumer_secret: this.consumerSecret,
+		token: this.access_token,
+		token_secret: this.access_token_secret
+	}
+	console.log('upload request');
+	request({
+			method: 'POST',
+			url: url,
+			formData: data,
+			oauth: oauth
+		},
+		function (error, response, body) {
+			if (error) {
+				console.log(error);
+				err(error, response, body);
+			} else {
+				console.log('WIN!');
+				console.log(response);
+				console.log(body);
+				console.log(oauth);
+				console.log(that.oauth);
+				res(body);
+			}
+		})
 };
 
 module.exports = FanfouAPI; 
