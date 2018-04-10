@@ -292,7 +292,6 @@ var XFZ = {
 	 *Setup the timeline
 	 */
 	renderTimeline : function(data, hidden){
-		console.log(data);
 		var timelineStream = document.getElementById('timelineStream');
 		timelineStream.classList.add('t-timeline-stream');
 
@@ -428,7 +427,7 @@ var XFZ = {
 				}, false);
 			}
 			if(hidden){
-				timelineStream.insertBefore(messageContainer, document.getElementById(XFZ.status.timeline.first));
+				timelineStream.insertBefore(messageContainer, timelineStream.firstChild);
 			} else {
 				timelineStream.appendChild(messageContainer);
 				XFZ.status.timeline.last = messageContainer.id;
