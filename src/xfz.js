@@ -1,6 +1,8 @@
 const BrowserWindow = require('electron').remote.BrowserWindow;
 var container = document.getElementById('container');
 var httpRequest = new XMLHttpRequest();
+var Action = require('./router/action');
+var action = new Action();
 
 // this event is used to show large image when user clicks an image in a message
 window.addEventListener('click', function (e) {
@@ -244,7 +246,7 @@ var XFZ = {
 						parameter.image = XFZ.status.input.image;
 						console.log(parameter.image);
 					}
-					XFZ.Post('/action/postStatus', parameter, function(data){
+					action.postStatus(parameter, function(data){
 						inputTextarea.value = '';
 						XFZ.resetInput(true);
 					});
@@ -411,7 +413,7 @@ var XFZ = {
 				destroy.classList.add('t-right-button');
 				destroy.dataset.id = message.id;
 				destroy.addEventListener('click', function(e){
-					XFZ.Post('/action/destroyStatus', {msgId : e.target.dataset.id}, function(data){
+					action.destroyStatus({msgId : e.target.dataset.id}, function(data){
 						console.log(data);
 						if(data.success){
 							// If the message is the first message, replace the first id with the one at second place
@@ -473,7 +475,7 @@ var XFZ = {
 	*/
 	checkNewTimeline : function(){
 		var firstId = XFZ.status.timeline.first;
-		XFZ.Post('/action/checkNewTimeline', {firstId: firstId}, function(data){
+		action.checkNewTimeline({firstId: firstId}, function(data){
 			if(data.success){
 				if(data.data.length > 0){
 					// store the new data into unread array
@@ -537,7 +539,7 @@ var XFZ = {
 				timelineStream.id = 'timelineStream';
 
 				XFZ.appendChilds(timeline, [timelineNotification, timelineStream]);
-				XFZ.Get('/action/getCurrUserHomeTimeline', function(data){
+				action.getCurrUserHomeTimeline(function(data){
 					if(!data.data){
 						var li = document.createElement('li');
 						li.style.listStyleType = 'none';
@@ -566,7 +568,7 @@ var XFZ = {
 									var loadingLi = document.createElement('li');
 									loadingLi.innerHTML = '载入中..';
 									document.getElementById('timelineStream').appendChild(loadingLi);
-									XFZ.Post('/action/getHomeTimelineBeforeLast', {contentId: lastId}, function(data){
+									action.getHomeTimelineBeforeLast({contentId: lastId}, function(data){
 										var parent = document.getElementById('timelineStream');
 										if(data.success){
 											var result = XFZ.setCacheData(data.data, XFZ.status.timeline.cache, XFZ.status.timeline.data, false);
@@ -604,20 +606,15 @@ var XFZ = {
 				overflow : 'hidden'
 			}
 			XFZ.setStyle(container, containerStyle);
-			XFZ.Get('/action/authorize', function(data){
-				if(!data.success){
-					window.location = data.url;
-				}
-				else{
-					XFZ.status.page = 'main';
-					XFZ.renderPage();
-				}
+			action.authorize(function(data){
+				XFZ.status.page = 'main';
+				XFZ.renderPage();
 			});
 		},
 		logout : function(){
 			container.innerHTML = '载入中..';
 			var div = document.createElement('div');
-			XFZ.Get('/action/logout', function(data){
+			action.logout(function(data){
 				if(data.success){
 					container.innerHTML = '登出成功!';
 				}
@@ -652,7 +649,7 @@ var XFZ = {
 			bodyContainer.id = 'bodyContainer';
 			var timeline = document.createElement('div');
 			
-			XFZ.Get('/action/getCurrUser', function(data){
+			action.getCurrUser(function(data){
 				if(data.success){
 					var inputContainer = XFZ.renderInput();
 					XFZ.status.currUser = data.data;

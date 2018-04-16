@@ -1,16 +1,5 @@
-var electron = require('electron');
+var {app, BrowserWindow} = require('electron');// 控制应用生命周期的模块。创建原生浏览器窗口的模块
 var path = require('path');
-var url = require('url');
-var app = electron.app;  // 控制应用生命周期的模块。
-var BrowserWindow = electron.BrowserWindow;  // 创建原生浏览器窗口的模块
-
-var express = require('express');
-var bodyParser = require('body-parser');
-var oauth =  require('oauth');
-var expressApp = express();
-
-var action = require('./router/action');
-var index = require('./router/index');
 
 // 保持一个对于 window 对象的全局引用，不然，当 JavaScript 被 GC，
 // window 会被自动地关闭
@@ -27,32 +16,11 @@ var init = function(){
 
     mainWindow.webContents.openDevTools();
 
-    expressApp.set('views', path.join(__dirname));
-    expressApp.set('view engine', 'ejs');
-    expressApp.use(bodyParser.json());
-    expressApp.use(bodyParser.urlencoded({ extended: false }));
-    
-    expressApp.use('/', index);
-    expressApp.use('/page', express.static(__dirname + '/views'));
-    expressApp.use('/src', express.static(__dirname + '/src'));
-    expressApp.use('/module', express.static(__dirname + '/node_modules'));
-
-    expressApp.use('/action', action);
-
-    expressApp.use(function(req, res, next) {
-        res.setHeader('Access-Control-Allow-Origin', 'http://127.0.0.1:3000/');
-        next();
-    });
-
     mainWindow.on('closed', function(){
         mainWindow = null;
     });
 
-    expressApp.listen(3000, function(){
-        console.log('Port 3000 is running');
-    });
-
-    mainWindow.loadURL('http://127.0.0.1:3000/');
+    mainWindow.loadURL(path.join(__dirname, 'index.html'));
 };
 
 // 当所有窗口被关闭了，退出。

@@ -1,43 +1,61 @@
-var router = require('express').Router();
+var {app} = require('electron');
+const BrowserWindow = require('electron').remote.BrowserWindow;
 var http = require('http');
 var fs = require('fs');
 var Config = require('electron-config');
 var FanfouAPI = require('./fanfouAPI');
-var {app} = require('electron');
 var fanfou = new FanfouAPI();
 var config = new Config();
 
-router.get('/authorize', function(req, res){
+var Action = function () {
+};
+
+Action.prototype.authorize = function (cb) {
 	if(config.get('access_token')){
 		console.log('Using saved access_token');
 		fanfou.access_token = config.get('access_token');
 		fanfou.access_token_secret = config.get('access_token_secret');
-		return res.json({success: true});
+		return cb({success: true});
 	}
 	else{
 		console.log('Send request for access_token');
+		var that = this;
 		fanfou.getOAuthRequestToken(function(oauth){
 			console.log('Token set.');
 			var redirectUrl = fanfou.authorizeURL + '?oauth_token=' + oauth.token + '&oauth_callback=http://127.0.0.1:3000/action/authorize/callback';
 			fanfou.token = oauth.token;
 			fanfou.token_secret = oauth.token_secret;
-
-			return res.json({success: false, url: redirectUrl});
+			var windowStyle = {
+				width: 800,
+				height: 600,
+				webPreferences: {
+					nodeIntegration: false
+				}
+			};
+			var authWindow = new BrowserWindow(windowStyle);
+			authWindow.loadURL(redirectUrl);
+			authWindow.show();
+			authWindow.webContents.on('did-get-redirect-request', function (e, oldUrl, newUrl) {
+				that.authorizeCallback(newUrl, function () {
+					authWindow.destroy();
+					cb();
+				})
+			})
 		});
 	}
-});
+};
 
-router.get('/authorize/callback', function(req, res){
+Action.prototype.authorizeCallback = function (url, cb) {
 	fanfou.getOAuthAccessToken(fanfou.oauth, function(oauth){
 		fanfou.access_token = oauth.access_token;
 		fanfou.access_token_secret = oauth.access_token_secret;
 		config.set('access_token', oauth.access_token);
 		config.set('access_token_secret', oauth.access_token_secret);
-		res.redirect('/');
+		cb();
 	});
-});
+};
 
-router.get('/getCurrUser', function(req, res){
+Action.prototype.getCurrUser = function(cb){
 	fanfou.getCurrUser(
 		function(err){
 			console.log(err);
@@ -47,57 +65,44 @@ router.get('/getCurrUser', function(req, res){
 			//console.log(data);
 			fanfou.userId = data.unique_id;
 			fanfou.avatar = data.profile_image_url;
-			return res.json({success: true, data: data});
+			cb({success: true, data: data});
 		});
-});
+};
 
-router.get('/getCurrAvatar', function(req, res){
+Action.prototype.getCurrAvatar = function(cb){
 	fs.readFile(app.getPath('appData') + '/xiaoFanZhuo/' + fanfou.userId + '/avatar/' + fanfou.userId + '.jpg', function(err, data){
 		if(err){
-			return res.json({success: false, data: err});
+			cb({success: false, data: err});
 		}
 		else{
 			var image = new Buffer(data).toString('base64');
-			return res.json({success: true, data: {image: image}});
+			cb({success: true, data: {image: image}});
 		}
 	});
-});
+};
 
-router.get('/getCurrUserHomeTimeline', function(req, res){
+Action.prototype.getCurrUserHomeTimeline = function(cb){
 	fanfou.getCurrUserHomeTimeline(
 		function(){
 
 		},
 		function(data){
 			data = JSON.parse(data);
-			return res.json({success: true, data: data});
+			cb({success: true, data: data});
 		}
 	);
-});
+};
 
-router.get('/logout', function(req, res){
+Action.prototype.logout = function(cb){
 	config.set('access_token', '');
 	config.set('access_token_secret', '');
-	return res.json({success: true});
-});
+	cb({success: true});
+};
 
-router.post('/postStatus', function(req, res){
+Action.prototype.postStatus = function (data, cb) {
 	console.log('/postStatus');
-	var data = {};
-	data.text = req.body.text;
 	fanfou.access_token = config.get('access_token');
 	fanfou.access_token_secret = config.get('access_token_secret');
-	if(req.body.isReply){
-		data.isReply = true;
-		data.replyToUser = req.body.replyToUser;
-		data.replyToId = req.body.replyToId;
-	} else if (req.body.isRepost) {
-		data.isRepost = true;
-		data.repostToId = req.body.repostToId;
-	} else if (req.body.hasImage) {
-		data.hasImage = true;
-		data.image = req.body.image;
-	}
 	fanfou.postStatus(
 		data,
 		function(error, result, body){
@@ -106,17 +111,17 @@ router.post('/postStatus', function(req, res){
 		},
 		function(data){
 			data = JSON.parse(data);
-			return res.json({success: true});
+			cb({success: true});
 		});
-});
+};
 
-router.post('/destroyStatus', function(req, res){
+Action.prototype.destroyStatus = function (data, cb) {
 	console.log('/destroyStatus');
-	if(req.body.msgId == undefined){
-		return res.json({success: false});
+	if(data.msgId == undefined){
+		cb({success: false, message: 'need msgId'});
 	}
 	else{
-		var data = req.body;
+		var data = {msgId: data.msgId};
 		fanfou.access_token = config.get('access_token');
 		fanfou.access_token_secret = config.get('access_token_secret');
 		fanfou.destroyStatus(
@@ -127,42 +132,39 @@ router.post('/destroyStatus', function(req, res){
 			},
 			function(data){
 				data = JSON.parse(data);
-				return res.json({success: true});
+				cb({success: true});
 			});
-
 	}
-});
+};
 
-router.post('/getHomeTimelineBeforeLast', function(req, res){
-	var id = req.body.contentId;
+Action.prototype.getHomeTimelineBeforeLast = function (data, cb){
 	fanfou.access_token = config.get('access_token');
 	fanfou.access_token_secret = config.get('access_token_secret');
 	fanfou.getHomeTimelineBeforeLast(
-		id,
+		data.contentId,
 		function(){
 
 		},
 		function(data){
 			data = JSON.parse(data);
-			return res.json({success: true, data: data});
+			cb({success: true, data: data});
 		}
 	);
-});
+};
 
-router.post('/checkNewTimeline', function(req, res){
+Action.prototype.checkNewTimeline = function (data, cb){
 	console.log('/checkNewTimeline');
-	var id = req.body.firstId;
 	fanfou.access_token = config.get('access_token');
 	fanfou.access_token_secret = config.get('access_token_secret');
 	fanfou.checkNewTimeline(
-		id,
+		data.firstId,
 		function(){
 
 		},
 		function(data){
 			data = JSON.parse(data);
-			return res.json({success: true, data: data});
+			cb({success: true, data: data});
 		}
 	);
-});
-module.exports = router;
+};
+module.exports = Action;

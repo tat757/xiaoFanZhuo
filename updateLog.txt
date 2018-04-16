@@ -1,3 +1,6 @@
+0.5.8
+-添加上传图片功能 | Added upload photo feature
+
 0.5.7
 -添加转发功能 | Added repost feature
 -添加显示时间轴中图片的功能 | Added feature that showing image in timeline message
