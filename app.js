@@ -10,7 +10,8 @@ var init = function(){
         width: 500, 
         height: 640,
         autoHideMenuBar: true,
-        backgroundColor: 'white'
+        backgroundColor: 'white',
+    //    resizable: false
     };
     mainWindow = new BrowserWindow(windowStyle);
 

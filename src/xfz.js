@@ -58,34 +58,8 @@ var XFZ = {
 		XFZ.status.page = 'welcome';
 		XFZ.renderPage();
 	},
-	Get : function(url, callback){
-		httpRequest = new XMLHttpRequest();
-		httpRequest.onreadystatechange = function(){
-			if(this.readyState == 4 && this.status == 200){
-				if(callback){
-					callback(JSON.parse(this.responseText));
-				}
-			}
-		};
-		httpRequest.open('GET', url, true);
-		httpRequest.send();
-	},
-	Post : function(url, data, callback){
-		httpRequest = new XMLHttpRequest();
-		httpRequest.open('POST', url, true);
-		data = JSON.stringify(data);
-		httpRequest.setRequestHeader('Content-type', 'application/json');
-
-		httpRequest.onreadystatechange = function(){
-			if(this.readyState == 4 && this.status == 200){
-				if(callback){
-					callback(JSON.parse(this.responseText));
-				}
-			}
-		};
-		httpRequest.send(data);
-	},
 	renderPage : function(){
+		container.innerHTML = '';
 		switch(XFZ.status.page){
 			case 'welcome' : 
 				XFZ.page.welcome();
@@ -601,22 +575,28 @@ var XFZ = {
 	},
 	page : {
 		welcome : function(){
-			container.innerHTML = '请稍候..';
-			var containerStyle = {
-				overflow : 'hidden'
-			}
-			XFZ.setStyle(container, containerStyle);
-			action.authorize(function(data){
-				XFZ.status.page = 'main';
-				XFZ.renderPage();
-			});
+			var div = document.createElement('div');
+			var loginLink = document.createElement('input');
+			loginLink.type = 'button';
+			loginLink.value = '登录';
+			loginLink.addEventListener('click', function () {
+				action.authorize(function(data){
+					XFZ.status.page = 'main';
+					XFZ.renderPage();
+				});
+			})
+			div.appendChild(loginLink);
+			container.appendChild(div);
 		},
 		logout : function(){
 			container.innerHTML = '载入中..';
-			var div = document.createElement('div');
 			action.logout(function(data){
 				if(data.success){
 					container.innerHTML = '登出成功!';
+					setTimeout(function () {
+						XFZ.status.page = 'welcome';
+						XFZ.renderPage();
+					}, 3000);
 				}
 			});
 		},
