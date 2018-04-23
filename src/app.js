@@ -24,6 +24,9 @@ var init = function(){
     mainWindow.loadURL(path.join(__dirname, 'index.html'));
 };
 
+app.on('ready', function () {
+    console.log('ready');
+})
 // 当所有窗口被关闭了，退出。
 app.on('window-all-closed', function() {
     // 在 OS X 上，通常用户在明确地按下 Cmd + Q 之前

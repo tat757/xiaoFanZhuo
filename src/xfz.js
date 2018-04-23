@@ -273,7 +273,7 @@ var XFZ = {
 
 		//for each data create a message block
 		var message, messageContainer;
-		var leftCell, userAvatarLink, userAvatar;
+		var leftCell, userAvatarLink, userAvatar, username;
 		var middleCell, middleTop, content, contentContainer, photo;
 		var rightCell, rightTop, rightMiddle, rightBottom;
 		var reply, destroy;
@@ -564,12 +564,12 @@ var XFZ = {
 		}
 	},
 	setStyle : function(id, styles){
-		for(style in styles){
+		for(var style in styles){
 			id.style[style] = styles[style];
 		}
 	},
 	appendChilds : function(parent, array){
-		for(id in array){
+		for(var id in array){
 			parent.appendChild(array[id]);
 		}
 	},

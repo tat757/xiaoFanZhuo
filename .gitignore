@@ -2,3 +2,7 @@ package-lock.json
 config.js
 /node_modules
 /XiaoFanZhuo
+/xiaoFanZhuo-win32-ia32
+/xiaoFanZhuo-win32-x64
+xiaoFanZhuo-win32-ia32.zip
+xiaoFanZhuo-win32-x64.zip

@@ -30,6 +30,7 @@ var FanfouAPI = function(){
 };
 
 FanfouAPI.prototype.getOAuthRequestToken = function(next){
+	var theOauth = this.oauth;
 	this.oauth.getOAuthRequestToken(function(err, oauth_token, oauth_token_secret, results){
 		if(err){
 			console.log('OAUTH REQUEST ERROR: ' + err);
@@ -40,9 +41,10 @@ FanfouAPI.prototype.getOAuthRequestToken = function(next){
 				token: oauth_token,
 				token_secret: oauth_token_secret
 			};
-
-			this.token = oauth_token;
-			this.token_secret = oauth_token_secret;
+			console.log('here');
+			console.log(this);
+			theOauth.token = oauth_token;
+			theOauth.token_secret = oauth_token_secret;
 
 			next(oauth);
 		}
@@ -50,6 +52,7 @@ FanfouAPI.prototype.getOAuthRequestToken = function(next){
 };
 
 FanfouAPI.prototype.getOAuthAccessToken = function(oauth, next){
+	var theOauth = this.oauth;
 	this.oauth.getOAuthAccessToken(this.token, this.token_secret, oauth.verifier, function(err, access_token, access_token_secret, results){
 		if(err){
 			console.log('OAUTH ACCESS ERROR: ' + err);
@@ -59,8 +62,8 @@ FanfouAPI.prototype.getOAuthAccessToken = function(oauth, next){
 			oauth.access_token = access_token;
 			oauth.access_token_secret = access_token_secret;
 
-			this.access_token = access_token;
-			this.access_token_secret = access_token_secret;
+			theOauth.access_token = access_token;
+			theOauth.access_token_secret = access_token_secret;
 
 			next(oauth);
 		}
@@ -160,7 +163,6 @@ FanfouAPI.prototype.uploadRequest = function (url, data, err, res) {
 		token: this.access_token,
 		token_secret: this.access_token_secret
 	}
-	console.log('upload request');
 	request({
 			method: 'POST',
 			url: url,
@@ -172,11 +174,6 @@ FanfouAPI.prototype.uploadRequest = function (url, data, err, res) {
 				console.log(error);
 				err(error, response, body);
 			} else {
-				console.log('WIN!');
-				console.log(response);
-				console.log(body);
-				console.log(oauth);
-				console.log(that.oauth);
 				res(body);
 			}
 		})
