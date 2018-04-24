@@ -11,7 +11,9 @@ var options = {
     ignore: [
         '/scripts',
         '.vscode',
-        '.gitignore'
+        '.gitignore',
+        '/xiaoFanZhuo-win32-ia32',
+        '/xiaoFanZhuo-win32-x64'
     ]
 }
 

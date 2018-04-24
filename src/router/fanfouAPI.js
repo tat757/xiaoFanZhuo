@@ -1,5 +1,5 @@
 var OAuth = require('oauth');
-var CONFIG = require('../config');
+var CONFIG = require(path.join(__dirname, '/../config'));
 var request = require('request');
 var fs = require('fs');
 var FANFOU_URL = {

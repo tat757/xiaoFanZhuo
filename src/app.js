@@ -11,11 +11,11 @@ var init = function(){
         height: 640,
         autoHideMenuBar: true,
         backgroundColor: 'white',
-    //    resizable: false
+        resizable: false
     };
     mainWindow = new BrowserWindow(windowStyle);
 
-    mainWindow.webContents.openDevTools();
+    // mainWindow.webContents.openDevTools();
 
     mainWindow.on('closed', function(){
         mainWindow = null;

@@ -3,7 +3,7 @@ const BrowserWindow = require('electron').remote.BrowserWindow;
 var http = require('http');
 var fs = require('fs');
 var Config = require('electron-config');
-var FanfouAPI = require('./fanfouAPI');
+var FanfouAPI = require(path.join(__dirname, '/fanfouAPI.js'));
 var fanfou = new FanfouAPI();
 var config = new Config();
 

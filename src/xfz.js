@@ -1,7 +1,8 @@
 const BrowserWindow = require('electron').remote.BrowserWindow;
 var container = document.getElementById('container');
 var httpRequest = new XMLHttpRequest();
-var Action = require('./router/action');
+var path = require('path');
+var Action = require(path.join(__dirname, '/router/action'));
 var action = new Action();
 
 // this event is used to show large image when user clicks an image in a message
