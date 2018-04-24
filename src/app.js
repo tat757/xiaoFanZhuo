@@ -24,9 +24,6 @@ var init = function(){
     mainWindow.loadURL(path.join(__dirname, 'index.html'));
 };
 
-app.on('ready', function () {
-    console.log('ready');
-})
 // 当所有窗口被关闭了，退出。
 app.on('window-all-closed', function() {
     // 在 OS X 上，通常用户在明确地按下 Cmd + Q 之前
@@ -35,6 +32,52 @@ app.on('window-all-closed', function() {
         app.quit();
     }
 });
-
-
 app.on('ready', init);
+
+if (handleSquirrelEvent()) {
+    return;
+}
+
+function handleSquirrelEvent () {
+    if (process.argv.length === 1) {
+        return false;
+    }
+
+    var ChildProcess = require('child_process');
+    
+    var appFolder = path.resolve(process.execPath, '..');
+    var rootAtomFoler = path.resolve(appFolder, '..');
+    var updateDotExe = path.resolve(path.join(rootAtomFoler, 'Update.exe'));
+    var exeName = path.basename(process.execPath);
+
+    var spawn = function (command, args) {
+        var spawnedProcess;
+        try {
+            spawnedProcess = ChildProcess.spawn(command, args, {detached: true});
+        } catch (err) {
+            console.log(err);
+        }
+        return spawnedProcess;
+    }
+
+    var spawnUpdate = function (args) {
+        return spawn(updateDotExe, args);
+    }
+
+    var squirrelEvent = process.argv[1];
+    switch (squirrelEvent) {
+        case '--squirrel-install':
+        case '--squirrel-updated':
+            spawnUpdate(['--createShortcut', exeName]);
+            setTimeout(app.quit, 1000);
+            return true;
+        case '--squirrel-uninstall':
+            spawnUpdate(['--removeShortcut', exeName]);
+            setTimeout(app.quit, 1000);
+            return true;
+
+        case '--squirrel-obsolete':
+            app.quit();
+            return true;
+    }
+}

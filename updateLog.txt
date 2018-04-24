@@ -1,3 +1,9 @@
+0.5.10
+-添加生成安装程序 | Added generating installer
+
+0.5.9
+-添加打包功能 | Added packager
+
 0.5.8
 -添加上传图片功能 | Added upload photo feature
 

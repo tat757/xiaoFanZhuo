@@ -11,10 +11,11 @@
   },
   "devDependencies": {
     "electron": "*",
-    "electron-builder": "^20.10.0",
-    "electron-packager": "^12.0.1"
+    "electron-packager": "*",
+    "electron-winstaller": "*"
   },
   "scripts": {
-    "pack": "node ./scripts/package.js"
+    "pack": "node ./scripts/package.js",
+    "installer": "node ./scripts/installer.js"
   }
 }
