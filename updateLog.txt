@@ -1,3 +1,6 @@
+0.6.0
+-添加自动更新功能 | Added autoupdate feature
+
 0.5.10
 -添加生成安装程序 | Added generating installer
 

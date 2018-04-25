@@ -2,7 +2,9 @@ var installer = require('electron-winstaller');
 var path = require('path');
 
 var result = installer.createWindowsInstaller({
-    appDirectory: './xiaoFanZhuo-win32-ia32',
+    appDirectory: './xiaoFanZhuo-win32-x64',
+    setupExe: 'xiaofanzhuo.exe',
+    iconUrl: path.join(__dirname, '/../assets/icons/logo'),
     noMsi: true
 })
 

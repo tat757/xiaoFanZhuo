@@ -18,3 +18,6 @@
 * 每10秒检测时间轴更新 Checking the update of timeline every 10 seconds
 * 显示信息中的照片 Showing the photo within a message
 * 点击查看放大图片 Showing large photo when user click an image in a message
+
+4. 其他 Others
+* 自动更新 Auto update

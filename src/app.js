@@ -1,11 +1,45 @@
-var {app, BrowserWindow} = require('electron');// 控制应用生命周期的模块。创建原生浏览器窗口的模块
+var {app, BrowserWindow, autoUpdater} = require('electron');// 控制应用生命周期的模块。创建原生浏览器窗口的模块
 var path = require('path');
 
 // 保持一个对于 window 对象的全局引用，不然，当 JavaScript 被 GC，
 // window 会被自动地关闭
 var mainWindow = null;
 
+autoUpdater.setFeedURL('http://fanfoufan.com/download');
+
+autoUpdater.on('update-not-available', function (info) {
+    global.updater = {
+        success: true,
+        message: 'no-update-available'
+    };
+});
+autoUpdater.on('checking-for-update', function (info) {
+    global.updater = {
+        success: true,
+        message: 'checking-for-update'
+    };
+});
+autoUpdater.on('update-available', function (info) {
+    global.updater = {
+        success: true,
+        message: 'available'
+    };
+});
+autoUpdater.on('update-downloaded', function (info) {
+    global.updater = {
+        success: true,
+        message: 'downloaded'
+    };
+});
+autoUpdater.on('error', function (info) {
+    global.updater = {
+        success: false,
+        message: info
+    };
+});
+
 var init = function(){
+    autoUpdater.checkForUpdates();
     var windowStyle = {
         width: 500, 
         height: 640,

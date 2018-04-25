@@ -40,4 +40,4 @@ var pack = function (platform, arch, cb) {
     })
 }
 
-pack('win32', 'ia32');
+pack('win32', 'x64');

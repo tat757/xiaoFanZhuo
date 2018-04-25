@@ -1,9 +1,13 @@
-const BrowserWindow = require('electron').remote.BrowserWindow;
+var electron = require('electron');
+const BrowserWindow = electron.remote.BrowserWindow;
 var container = document.getElementById('container');
 var httpRequest = new XMLHttpRequest();
 var path = require('path');
 var Action = require(path.join(__dirname, '/router/action'));
 var action = new Action();
+
+console.log(electron.remote.getGlobal('updater'));
+console.log('updater = ', electron.remote.getGlobal('updater').success);
 
 // this event is used to show large image when user clicks an image in a message
 window.addEventListener('click', function (e) {
