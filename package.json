@@ -1,6 +1,6 @@
 {
   "name": "xiaoFanZhuo",
-  "version": "0.5.10",
+  "version": "0.6.1",
   "main": "/src/app.js",
   "author": "TATx",
   "description": "A desktop app of fanfou",
@@ -16,6 +16,7 @@
   },
   "scripts": {
     "pack": "node ./scripts/package.js",
-    "installer": "node ./scripts/installer.js"
+    "installer": "node ./scripts/installer.js",
+    "start": "electron ./src/app"
   }
 }

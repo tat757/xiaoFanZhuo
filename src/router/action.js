@@ -10,11 +10,23 @@ var config = new Config();
 var Action = function () {
 };
 
-Action.prototype.authorize = function (cb) {
-	if(config.get('access_token')){
-		console.log('Using saved access_token');
+Action.prototype.checkToken = function (cb) {
+	if (config.get('access_token')) {
 		fanfou.access_token = config.get('access_token');
 		fanfou.access_token_secret = config.get('access_token_secret');
+		return {
+			success: true
+		}
+	} else {
+		return {
+			success: false,
+			message: 'need login'
+		}
+	}
+}
+
+Action.prototype.authorize = function (cb) {
+	if(this.checkToken){
 		return cb({success: true});
 	}
 	else{

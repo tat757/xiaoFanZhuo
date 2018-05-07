@@ -21,10 +21,46 @@ body {
 	-webkit-app-region: drag;
 }
 
-.t-alert {
-	display: none;
-	width: 100%;
+.t-alert-open {
+	display: block;
+	width: 472px;
 	height: 20px;
+	margin: 0 0 4px 0;
+	animation-duration: 0.5s;
+	animation-name: popAlert;
+}
+
+@keyframes popAlert {
+	from {
+		transform: scaleY(0);
+	}
+	to {
+		transform: scaleY(1);
+	}
+}
+
+.t-alert-close {
+	display: none;
+	width: 472px;
+	margin: 0 0 4px 0;
+	animation-duration: 0.5s;
+	animation-name: closeAlert;
+	animation-fill-mode: forwards;
+}
+
+@keyframes closeAlert {
+	from {
+		height: 20px;
+	}
+	to {
+		height: 0px;
+	}
+}
+
+.t-alert-text {
+	text-align: center;
+	margin: 0;
+	color: white;
 }
 
 .t-timeline-container {
@@ -183,4 +219,12 @@ body {
 .t-sm-container {
 	font-size: 12px;
 	margin: 0;
+}
+
+.success {
+	background-color: #339966;
+}
+
+.danger {
+	background-color: #993333;
 }

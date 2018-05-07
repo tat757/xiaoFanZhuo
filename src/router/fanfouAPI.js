@@ -41,8 +41,6 @@ FanfouAPI.prototype.getOAuthRequestToken = function(next){
 				token: oauth_token,
 				token_secret: oauth_token_secret
 			};
-			console.log('here');
-			console.log(this);
 			theOauth.token = oauth_token;
 			theOauth.token_secret = oauth_token_secret;
 

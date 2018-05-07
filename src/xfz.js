@@ -54,6 +54,7 @@ var XFZ = {
 			first: '',
 			last: ''
 		},
+		alertTimer: null,
 		nav : 'home',
 		notMain : false,
 		loadingContent : false
@@ -226,6 +227,9 @@ var XFZ = {
 						console.log(parameter.image);
 					}
 					action.postStatus(parameter, function(data){
+						// TODO: add success alert
+						XFZ.setAlert('success', 'post');
+						XFZ.checkNewTimeline();
 						inputTextarea.value = '';
 						XFZ.resetInput(true);
 					});
@@ -395,6 +399,7 @@ var XFZ = {
 					action.destroyStatus({msgId : e.target.dataset.id}, function(data){
 						console.log(data);
 						if(data.success){
+							XFZ.setAlert('success', 'delete')
 							// If the message is the first message, replace the first id with the one at second place
 							if(XFZ.status.timeline.first === e.target.dataset.id){
 								XFZ.status.timeline.data.shift();
@@ -501,10 +506,6 @@ var XFZ = {
 				bodyContainer.innerHTML = 'Under construction';
 			}
 			else{
-				var alert = document.createElement('div');
-				alert.id = 'alert';
-				alert.classList.add('t-alert');
-
 				var timeline = document.createElement('div');
 				timeline.id = 'timeline';
 				timeline.classList.add('t-timeline-container')
@@ -580,21 +581,25 @@ var XFZ = {
 	},
 	page : {
 		welcome : function(){
-			var div = document.createElement('div');
-			var loginLink = document.createElement('input');
-			loginLink.type = 'button';
-			loginLink.value = '登录';
-			loginLink.addEventListener('click', function () {
-				action.authorize(function(data){
-					XFZ.status.page = 'main';
-					XFZ.renderPage();
-				});
-			})
-			div.appendChild(loginLink);
-			container.appendChild(div);
+			if (action.checkToken()) {
+				XFZ.status.page = 'main';
+				XFZ.renderPage();
+			} else {
+				var div = document.createElement('div');
+				var loginLink = document.createElement('input');
+				loginLink.type = 'button';
+				loginLink.value = '登录';
+				loginLink.addEventListener('click', function () {
+					action.authorize(function(data){
+						XFZ.status.page = 'main';
+						XFZ.renderPage();
+					});
+				})
+				div.appendChild(loginLink);
+				container.appendChild(div);
+			}
 		},
 		logout : function(){
-			container.innerHTML = '载入中..';
 			action.logout(function(data){
 				if(data.success){
 					container.innerHTML = '登出成功!';
@@ -606,7 +611,6 @@ var XFZ = {
 			});
 		},
 		main : function(){
-			container.innerHTML = '加载中..';
 			var div = document.createElement('div');
 
 			var navBarContainer = document.createElement('div');
@@ -671,6 +675,35 @@ var XFZ = {
 			data: finalData,
 			cache: finalCache
 		};
+	},
+	setAlert: function (option, type) {
+		var option = '';
+		var text = '';
+		if (type === 'post') {
+			text = '发布';
+		} else if (type === 'delete') {
+			text = '删除';
+		}
+
+		if (option === 'success') {
+			text += '成功';
+		} else {
+			text += '错误'
+		}
+
+		if (text === '错误') {
+			text = '村长在用服务器下片，请稍后再试。';
+		}
+		document.getElementById('alert').className = 't-alert-open ' + option;
+		document.getElementById('alertText').textContent = text;
+		document.getElementById('alert').style.display = 'block';
+		if (XFZ.alertTimer) {
+			clearTimeout(XFZ.alertTimer);
+		}
+		XFZ.alertTimer = setTimeout(function () {
+			document.getElementById('alert').classList.remove('t-alert-open');
+			document.getElementById('alert').classList.add('t-alert-close');
+		}, 3000);
 	},
 	resetInput: function (full) {
 		XFZ.status.input.isReply = false;
