@@ -98,8 +98,8 @@ var XFZ = {
 		var logoutButton = document.createElement('input');
 		logoutButton.id = 'logoutButton';
 		logoutButton.type = 'button';
-		logoutButton.value = 'x'; // TODO: replace with power image
-		logoutButton.classList.add('t-logout-button');
+		logoutButton.value = '登出'; // TODO: replace with power image
+		logoutButton.className = 't-xs-font';
 		logoutButton.onclick = function (e) {
 			var target = e.target;
 			XFZ.status.page = 'logout';
@@ -108,12 +108,17 @@ var XFZ = {
 
 		var featureBlock = document.createElement('div');
 		featureBlock.id = 'featureBlock';
-		featureBlock.classList.add('t-feature-block');
 		featureBlock.appendChild(logoutButton);
+
+		var letterCounter = document.createElement('div');
+		letterCounter.id = 'letterCounter';
+		letterCounter.className = 't-letter-counter darkFont';
+		letterCounter.textContent = '140';
 
 		var avatarContainer = document.createElement('div');
 		avatarContainer.classList.add('t-avatar-container');
 		avatarContainer.appendChild(avatarBlock);
+		avatarContainer.appendChild(letterCounter);
 		avatarContainer.appendChild(featureBlock);
 
 		var textarea = document.createElement('textarea');
@@ -129,8 +134,21 @@ var XFZ = {
 
 		textarea.addEventListener('input', function (e) {
 			var inputTextarea = document.getElementById('inputTextarea');
+			var counter = document.getElementById('letterCounter');
+			counter.classList.remove('warningFont', 'dangerFont', 'darkFont');
 			if (inputTextarea.value === '') {
 				XFZ.resetInput();
+				counter.textContent = '140';
+				counter.classList.add('darkFont')
+			} else {
+				counter.textContent = 140 - inputTextarea.value.length;
+				if (+counter.textContent < 50 && +counter.textContent > 0) {
+					counter.classList.add('warningFont')
+				} else if (+counter.textContent <= 0) {
+					counter.classList.add('dangerFont')
+				} else {
+					counter.classList.add('darkFont')
+				}
 			}
 		});
 		var uploadContainer = document.createElement('div');
@@ -149,18 +167,14 @@ var XFZ = {
 
 		var imageNameContainer = document.createElement('p');
 		imageNameContainer.id = 'imageNameContainer';
-		imageNameContainer.classList.add('t-hidden');
-		imageNameContainer.classList.add('t-sm-container');
-		imageNameContainer.classList.add('t-fl');
+		imageNameContainer.className = 't-hidden t-sm-font t-fl grey';
 		var imageName = document.createElement('span');
 		imageName.id = 'imageName';
 		imageName.classList.add('t-ml-5');
 		imageName.innerHTML = '';
 		var imageCloseButton = document.createElement('span');
 		imageCloseButton.innerHTML = 'X';
-		imageCloseButton.classList.add('t-ml-5');
-		imageCloseButton.classList.add('t-hover');
-		imageCloseButton.classList.add('t-pointer');
+		imageCloseButton.className = 't-ml-5 t-pr-2 t-pl-2 t-mt-2 t-mr-2 t-hover t-pointer dark';
 		imageCloseButton.addEventListener('click', function (e) {
 			imageName.innerHTML = '';
 			document.getElementById('imageNameContainer').classList.toggle('t-hidden');
@@ -581,7 +595,7 @@ var XFZ = {
 	},
 	page : {
 		welcome : function(){
-			if (action.checkToken()) {
+			if (action.checkToken().success) {
 				XFZ.status.page = 'main';
 				XFZ.renderPage();
 			} else {

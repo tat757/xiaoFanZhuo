@@ -20,7 +20,10 @@ body {
 	width: 100%;
 	-webkit-app-region: drag;
 }
-
+#featureBlock {
+	padding: 0 0 0 4px;
+	margin: -1px 0 0 0;
+}
 .t-alert-open {
 	display: block;
 	width: 472px;
@@ -106,6 +109,7 @@ body {
 
 .t-avatar-container {
 	width: 100%;
+	margin: auto 0;
 }
 
 .t-feature-block {
@@ -181,6 +185,9 @@ body {
 	font-weight: bold;
 }
 
+.t-letter-counter {
+	text-align: center;
+}
 
 .t-timeline-stream {
 	padding: 0;
@@ -195,13 +202,44 @@ body {
 .t-sm-font {
 	font-size: 12px;
 }
+.t-xs-font {
+	font-size: 10px;
+}
 
 .t-hidden {
 	display: none;
 }
 
+.t-pr-2 {
+	padding-right: 2px;
+}
+
+.t-pl-2 {
+	padding-left: 2px;
+}
+.t-pb-5 {
+	padding-bottom: 5px;
+}
+
 .t-ml-5 {
 	margin-left: 5px;
+}
+
+.t-mt-2 {
+	margin-top: 2px;
+}
+.t-mt-3 {
+	margin-top: 3px;
+}
+.t-mb-2 {
+	margin-bottom: 2px;
+}
+.t-m-0 {
+	margin: auto 0;
+}
+
+.t-mr-2 {
+	margin-right: 2px;
 }
 
 .t-hover:hover {
@@ -216,15 +254,34 @@ body {
 	float: left;
 }
 
-.t-sm-container {
-	font-size: 12px;
-	margin: 0;
-}
-
 .success {
 	background-color: #339966;
 }
 
 .danger {
 	background-color: #993333;
+}
+
+.grey {
+	background-color: #9CACBC;
+}
+
+.warning {
+	background-color: #D69900;
+}
+
+.dark {
+	background-color: #5F6872;
+}
+
+.warningFont {
+	color: #D69900;
+}
+
+.dangerFont {
+	color: #993333;
+}
+
+.darkFont {
+	color: #5F6872;
 }

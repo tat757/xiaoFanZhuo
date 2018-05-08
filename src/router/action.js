@@ -11,7 +11,7 @@ var Action = function () {
 };
 
 Action.prototype.checkToken = function (cb) {
-	if (config.get('access_token')) {
+	if (config.get('access_token') !== '') {
 		fanfou.access_token = config.get('access_token');
 		fanfou.access_token_secret = config.get('access_token_secret');
 		return {
@@ -26,7 +26,7 @@ Action.prototype.checkToken = function (cb) {
 }
 
 Action.prototype.authorize = function (cb) {
-	if(this.checkToken){
+	if(this.checkToken.success){
 		return cb({success: true});
 	}
 	else{
