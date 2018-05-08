@@ -21,3 +21,5 @@
 
 4. 其他 Others
 * 自动更新 Auto update
+* 字数提示 Letter counter
+* 状态提示 Alert

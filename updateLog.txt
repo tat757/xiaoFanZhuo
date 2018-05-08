@@ -1,3 +1,10 @@
+0.6.2
+-添加字数提示 | Added letter counter
+-修复登录问题 | Fixed an login error
+
+0.6.1
+-添加状态提醒 | Added alert
+
 0.6.0
 -添加自动更新功能 | Added autoupdate feature
 

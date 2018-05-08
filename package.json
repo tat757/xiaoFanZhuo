@@ -1,6 +1,6 @@
 {
   "name": "xiaoFanZhuo",
-  "version": "0.6.1",
+  "version": "0.6.2",
   "main": "/src/app.js",
   "author": "TATx",
   "description": "A desktop app of fanfou",
