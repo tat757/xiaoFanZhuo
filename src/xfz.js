@@ -693,11 +693,13 @@ var XFZ = {
 	setAlert: function (option, type) {
 		var option = '';
 		var text = '';
-		if (type === 'post') {
-			text = '发布';
-		} else if (type === 'delete') {
-			text = '删除';
+		var lib = {
+			post: '发布',
+			delete: '删除',
+			favorite: '收藏',
+			unfavorite: '取消收藏'
 		}
+		text = lib[type];
 
 		if (option === 'success') {
 			text += '成功';

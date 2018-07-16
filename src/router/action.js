@@ -129,7 +129,7 @@ Action.prototype.postStatus = function (data, cb) {
 
 Action.prototype.destroyStatus = function (data, cb) {
 	console.log('/destroyStatus');
-	if(data.msgId == undefined){
+	if(!data.msgId){
 		cb({success: false, message: 'need msgId'});
 	}
 	else{
@@ -149,6 +149,27 @@ Action.prototype.destroyStatus = function (data, cb) {
 	}
 };
 
+Action.prototype.favoriteStatus = function (data, cb) {
+	console.log('/favoriteStatus');
+	if(!data.msgId){
+		cb({success: false, message: 'need msgId'});
+	}
+	else{
+		var query = {msgId: data.msgId, state: data.state};
+		fanfou.access_token = config.get('access_token');
+		fanfou.access_token_secret = config.get('access_token_secret');
+		fanfou.favoriteStatus(
+			query,
+			function(error, result, body){
+				console.log(result);
+				console.log(body);
+			},
+			function(res){
+				res = JSON.parse(res);
+				cb({success: true});
+			});
+	}
+};
 Action.prototype.getHomeTimelineBeforeLast = function (data, cb){
 	fanfou.access_token = config.get('access_token');
 	fanfou.access_token_secret = config.get('access_token_secret');

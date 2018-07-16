@@ -119,6 +119,13 @@ FanfouAPI.prototype.destroyStatus = function(data, err, res){
 	this.postRequest(url, parameter, err, res);
 };
 
+FanfouAPI.prototype.favoriteStatus = function (data, err, res) {
+	var path = '/favorites/' + data.state + '.json'
+	var parameter = {id: data.msgId};
+	var url = this.apiBaseURL + path;
+	this.postRequest(url, parameter, err, res);
+}
+
 FanfouAPI.prototype.getHomeTimelineBeforeLast = function(lastId, err, res){
 	var path = '/statuses/home_timeline.json?count=10&max_id=' + lastId;
 	var url = this.apiBaseURL + path;
