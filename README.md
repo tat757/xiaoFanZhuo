@@ -2,6 +2,9 @@
 
 > Rework version with vue
 
+> The old version can be found <a href="https://github.com/tat757/xiaoFanZhuo/tree/OLD_Version">here</a>
+
+
 #### Build Setup
 
 ``` bash
