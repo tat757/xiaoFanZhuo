@@ -18,6 +18,15 @@ const status = {
           console.log(err)
         })
       })
+    },
+    NewStatus(context, params) {
+      return new Promise((resolve, reject) => {
+        fanfou.post('/statuses/update', params).then((res) => {
+          resolve(res)
+        }).catch((err) => {
+          console.log(err)
+        })
+      })
     }
   } 
 }

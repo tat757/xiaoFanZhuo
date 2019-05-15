@@ -12,4 +12,7 @@
 
 <style>
   /* CSS */
+  body {
+    overflow-y: hidden;
+  }
 </style>

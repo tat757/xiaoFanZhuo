@@ -1,8 +1,16 @@
 <template>
-  <div>
+  <div class="timeline">
     <Status v-for="status in statuses" :key="status.id" :data="status"/>
   </div>
 </template>
+
+<style>
+.timeline {
+  overflow-y: scroll;
+  height: 450px;
+}
+</style>
+
 <script>
 import Status from '../components/Status'
 export default {
