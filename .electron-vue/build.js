@@ -100,13 +100,11 @@ function pack (config) {
 
 function bundleApp () {
   buildConfig.mode = 'production'
-  packager(buildConfig, (err, appPaths) => {
-    if (err) {
-      console.log(`\n${errorLog}${chalk.yellow('`electron-packager`')} says...\n`)
-      console.log(err + '\n')
-    } else {
-      console.log(`\n${doneLog}\n`)
-    }
+  packager(buildConfig).then((appPaths) => {
+    console.log(`\n${doneLog}\n`)
+  }).catch((err) => {
+    console.log(`\n${errorLog}${chalk.yellow('`electron-packager`')} says...\n`)
+    console.log(err + '\n')
   })
 }
 

@@ -11,12 +11,12 @@
 </template>
 <style>
 .status {
-  background-color: grey;
   min-height: 100px;
   margin: 2px !important;
+  border-bottom: 1px solid;
 }
 .status:hover {
-  background-color: red;
+  background-color: #93b5cf;
 }
 .status-avatar {
   width: 50px !important;

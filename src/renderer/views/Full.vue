@@ -1,10 +1,15 @@
 <template>
-  <div>
+  <div class="full">
     <InputField/>
     <Menu/>
     <router-view/>
   </div>
 </template>
+<style>
+.full {
+  background-color: #E6EBED;
+}
+</style>
 <script>
 import InputField from '../components/InputField'
 import Menu from '../components/Menu'

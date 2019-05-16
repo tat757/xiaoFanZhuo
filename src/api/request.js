@@ -3,6 +3,7 @@ const Store = require('electron-store')
 const Fanfou = require('fanfou-sdk')
 const electron = require('electron');
 const BrowserWindow = electron.remote.BrowserWindow;
+const fs = require('fs')
 
 const config = require('../../config')
 
@@ -116,6 +117,17 @@ Fanfou.prototype.logout = () => {
 		store.set('access_token', '')
 		store.set('access_token_secret', '')
 		resolve()
+	})
+}
+
+Fanfou.prototype.uploadPhoto = (params) => {
+	params.photo = fs.createReadStream(params.photo.path)
+	return new Promise((resolve, reject) => {
+		fanfou.post('/photos/upload', params).then((res) => {
+			resolve(res)
+		}).catch((err) => {
+			console.log(err)
+		})
 	})
 }
 export default fanfou
