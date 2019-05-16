@@ -18,7 +18,7 @@ function createWindow () {
    * Initial window options
    */
   mainWindow = new BrowserWindow({
-    width: 500, 
+    width: 521, 
     height: 640,
     autoHideMenuBar: true,
     backgroundColor: 'white'
