@@ -7,7 +7,7 @@
 </template>
 <style>
 .full {
-  background-color: #E6EBED;
+  background-color: #F9FAFC;
 }
 </style>
 <script>

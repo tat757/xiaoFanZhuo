@@ -1,18 +1,28 @@
 <template>
-  <div style="padding: 5px;">
-    <b-nav justified tabs>
-      <b-nav-item :class="getClass('timeline')" @click="handleRedirct('timeline')">首页</b-nav-item>
-      <b-nav-item :class="getClass('mention')" @click="handleRedirct('mention')">@提到我的</b-nav-item>
-    </b-nav>
+  <div>
+    <b-row class="text-center">
+      <b-col :class="getClass('timeline')" @click="handleRedirct('timeline')"><span class="menu-item-text">首页</span></b-col>
+      <b-col :class="getClass('mention')" @click="handleRedirct('mention')"><span class="menu-item-text">@提到我的</span></b-col>
+    </b-row>
   </div>
 </template>
 <style>
 .menu-item-active {
-  background-color: #346c9c !important;
+  background-color: rgba(90, 122, 188, 1) !important;
+  color: white;
 }
 .menu-item {
-  background-color: #93b5cf;
-  color: white !important;
+  background-color: rgba(208, 217, 236, 0.5);
+  cursor: pointer;
+  height: 40px;
+}
+.menu-item:hover {
+  background-color: rgba(208, 217, 236, 1);
+}
+.menu-item-text {
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
 }
 </style>
 <script>

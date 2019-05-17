@@ -11,14 +11,15 @@
         v-model="input"
         rows="3"
         max-rows="5"
-        class="input-field-textarea"/>
+        :class="textareaClass"
+        @input="handleTextareaChange"/>
       <div>
         <label for="uploadImage">
-          <span class="input-field-text" aria-hidden="true">上传照片</span>
+          <span class="text-button" aria-hidden="true">上传照片</span>
           <b-form-file id="uploadImage" v-model="image" style="display: none"/>
         </label>
         <span class="upload-image-name">{{uploadImageName}}</span>
-        <span class="input-field-text" style="float: right; margin: 2px 10px 0 10px;" @click="handleNewStatus">发送</span>
+        <span class="text-button" style="float: right; margin: 2px 10px 0 10px;" @click="handleNewStatus">发送</span>
         <span :style="{float: 'right', color: count < 50 ? 'red' : 'black'}">{{count}}</span>
       </div>
     </b-col>
@@ -36,13 +37,6 @@
   font-size: 12px;
   font-style: italic;
 }
-.input-field-text {
-  font-size: 12px;
-  cursor: pointer;
-}
-.input-field-textarea {
-  background-color: #93b5cf !important;
-}
 </style>
 <script>
 export default {
@@ -50,7 +44,8 @@ export default {
   data() {
     return {
       input: '',
-      image: null
+      image: null,
+      textareaClass: 'textarea'
     }
   },
   computed: {
@@ -85,7 +80,13 @@ export default {
           this.image = null
         })
       }
-      console.log(this.image)
+    },
+    handleTextareaChange(data) {
+      if (data.split('\n').length > 5) {
+        this.textareaClass = 'scroll show-scroll-y'
+      } else {
+        this.textareaClass = 'textarea'
+      }
     }
   }
 }
