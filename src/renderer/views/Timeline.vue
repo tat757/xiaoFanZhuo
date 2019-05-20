@@ -11,13 +11,16 @@
       hide-header
       hide-footer
       centered>
-      <div v-if="modal.hasTextarea">
+      <div v-show="modal.hasTextarea">
         <b-form-textarea
-          v-model="input"
+          v-model="input.status"
+          ref="modalInput"
           rows="3"
           max-rows="5"
           :class="textareaClass"
           @input="handleTextareaChange"/>
+        <span class="text-button" style="float: right; margin: 2px 10px 0 10px;" @click="handleStatus(modal.type)">发送</span>
+        <span :style="{float: 'right', color: count < 50 ? 'red' : 'black'}">{{count}}</span>
       </div>
       <div v-if="modal.text !== ''">
         {{this.modal.text}}
@@ -59,9 +62,16 @@ export default {
         hasTextarea: false,
         text: ''
       },
-      input: '',
+      input: {
+        status: ''
+      },
       lastId: '',
       textareaClass: 'textarea'
+    }
+  },
+  computed: {
+    count() {
+      return 140 - this.input.status.length
     }
   },
   mounted() {
@@ -95,6 +105,28 @@ export default {
           this.modal.text = '你确定要删除这' + deleteType + '吗？'
           break
         }
+        case 'reply': {
+          this.input.status = '@' + data.user.name + ' '
+          this.input.in_reply_to_status_id = data.id
+          this.input.in_reply_to_user_id = data.user.id
+          this.$nextTick().then(() => {
+            this.$nextTick().then(() => {
+              this.$refs.modalInput.focus()
+            })
+          })
+          break
+        }
+        case 'repost': {
+          this.input.status = '转@' + data.user.name + ' ' + data.plain_text
+          this.input.repost_status_id = data.id
+          this.$nextTick().then(() => {
+            this.$nextTick().then(() => {
+              this.$refs.modalInput.focus()
+              this.$refs.modalInput.setSelectionRange(0, 0)
+            })
+          })
+          break
+        }
       }
     },
     resetModal() {
@@ -107,7 +139,11 @@ export default {
       }
     },
     handleAction(type, data) {
-      this.setModal(type, data)
+      if (type === 'favorite') {
+        this.handleFavorite(data)
+      } else {
+        this.setModal(type, data)
+      }
     },
     handleTextareaChange(data) {
       if (data.split('\n').length > 5) {
@@ -117,15 +153,26 @@ export default {
       }
     },
     handleConfirm() {
-      console.log(this.modal)
-      this.$store.dispatch('DestoryStatus', {id: this.modal.data.id}).then((res) => {
-        console.log(res)
-      })
+      this.$store.dispatch('DestroyStatus', {id: this.modal.data.id})
       this.statuses.data[this.statuses.cache[this.modal.data.id]].isDelete = true
       this.resetModal()
     },
     handleCancel() {
       this.resetModal()
+    },
+    handleStatus(type) {
+      this.$store.dispatch('NewStatus', this.input)
+      this.resetModal()
+    },
+    handleFavorite(data) {
+      console.log(data)
+      if (data.favorited) {
+        this.$store.dispatch('Favorite', {id: data.id, destroy: true})
+        this.statuses.data[this.statuses.cache[data.id]].isFavorite = false
+      } else {
+        this.$store.dispatch('Favorite', {id: data.id})
+        this.statuses.data[this.statuses.cache[data.id]].isFavorite = true
+      }
     }
   }
 }

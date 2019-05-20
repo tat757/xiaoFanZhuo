@@ -25,8 +25,11 @@
         <div>
           <span class="text-button" @click="handleAction('repost')">转发</span>
         </div>
-        <div>
+        <div v-if="!data.favorited">
           <span class="text-button" @click="handleAction('favorite')">收藏</span>
+        </div>
+        <div v-else>
+          <span class="text-button" @click="handleAction('favorite')">取消</span>
         </div>
       </div>
     </div>

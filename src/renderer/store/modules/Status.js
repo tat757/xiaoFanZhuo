@@ -28,9 +28,24 @@ const status = {
         })
       })
     },
-    DestoryStatus(context, params) {
+    DestroyStatus(context, params) {
       return new Promise((resolve, reject) => {
         fanfou.post('/statuses/destroy', params).then((res) => {
+          resolve(res)
+        }).catch((err) => {
+          console.log(err)
+        })
+      })
+    },
+    Favorite(context, params) {
+      return new Promise((resolve, reject) => {
+        let url = ''
+        if (params.destroy) {
+          url = '/favorites/destroy'
+        } else {
+          url = '/favorites/create'
+        }
+        fanfou.post(url, {id: params.id}).then((res) => {
           resolve(res)
         }).catch((err) => {
           console.log(err)
