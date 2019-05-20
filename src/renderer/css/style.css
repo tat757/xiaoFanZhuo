@@ -13,8 +13,13 @@ body {
 }
 
 .text-button:hover {
-  background-color: grey;
-  color: white;
+  background-color: grey !important;
+  color: white !important;
+}
+
+.text-button.text-danger:hover {
+	color: white !important;
+	background-color: #dc3545 !important;
 }
 
 .scroll::-webkit-scrollbar {

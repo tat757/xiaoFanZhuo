@@ -7,7 +7,7 @@ const status = {
   mutations: {
   },
   actions: {
-    GetTimeline() {
+    InitTimeline() {
       return new Promise((resolve, reject) => {
         const option = {
           count: 20
@@ -22,6 +22,15 @@ const status = {
     NewStatus(context, params) {
       return new Promise((resolve, reject) => {
         fanfou.post('/statuses/update', params).then((res) => {
+          resolve(res)
+        }).catch((err) => {
+          console.log(err)
+        })
+      })
+    },
+    DestoryStatus(context, params) {
+      return new Promise((resolve, reject) => {
+        fanfou.post('/statuses/destroy', params).then((res) => {
           resolve(res)
         }).catch((err) => {
           console.log(err)
