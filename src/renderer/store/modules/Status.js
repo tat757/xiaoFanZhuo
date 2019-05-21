@@ -41,9 +41,9 @@ const status = {
       return new Promise((resolve, reject) => {
         let url = ''
         if (params.destroy) {
-          url = '/favorites/destroy'
+          url = '/favorites/destroy/' + params.userId
         } else {
-          url = '/favorites/create'
+          url = '/favorites/create/' + params.userId
         }
         fanfou.post(url, {id: params.id}).then((res) => {
           resolve(res)

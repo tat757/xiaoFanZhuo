@@ -165,13 +165,12 @@ export default {
       this.resetModal()
     },
     handleFavorite(data) {
-      console.log(data)
       if (data.favorited) {
-        this.$store.dispatch('Favorite', {id: data.id, destroy: true})
-        this.statuses.data[this.statuses.cache[data.id]].isFavorite = false
+        this.$store.dispatch('Favorite', {id: data.id, destroy: true, userId: data.user.id})
+        this.statuses.data[this.statuses.cache[data.id]].favorited = false
       } else {
-        this.$store.dispatch('Favorite', {id: data.id})
-        this.statuses.data[this.statuses.cache[data.id]].isFavorite = true
+        this.$store.dispatch('Favorite', {id: data.id, userId: data.user.id})
+        this.statuses.data[this.statuses.cache[data.id]].favorited = true
       }
     }
   }
