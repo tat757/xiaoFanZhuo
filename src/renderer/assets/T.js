@@ -35,7 +35,7 @@ const T = {
       const year = month * 12
       let text = ''
       if (cap < minute) {
-        text = cap + '秒前'
+        text = Math.floor(cap / 1000) + '秒前'
       } else if (cap < hour) {
         text = Math.floor(cap / minute) + '分钟前'
       } else if (cap < day) {
