@@ -2,9 +2,12 @@ import fanfou from '../../../api/request'
 
 const status = {
   state: {
-    timeline: {}
+    updateTime: 0
   },
   mutations: {
+    setUpdateTime(state, time) {
+      state.updateTime = time
+    }
   },
   actions: {
     InitTimeline() {
@@ -22,6 +25,7 @@ const status = {
     NewStatus(context, params) {
       return new Promise((resolve, reject) => {
         fanfou.post('/statuses/update', params).then((res) => {
+          context.commit('setUpdateTime', Date.now())
           resolve(res)
         }).catch((err) => {
           console.log(err)
@@ -55,6 +59,16 @@ const status = {
     UploadPhoto(context, params) {
       return new Promise((resolve, reject) => {
         fanfou.uploadPhoto(params).then((res) => {
+          context.commit('setUpdateTime', Date.now())
+          resolve(res)
+        }).catch((err) => {
+          console.log(err)
+        })
+      })
+    },
+    GetNewStatus(context, params) {
+      return new Promise((resolve, reject) => {
+        fanfou.get('/statuses/home_timeline', params).then((res) => {
           resolve(res)
         }).catch((err) => {
           console.log(err)

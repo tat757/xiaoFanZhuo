@@ -1,8 +1,11 @@
 <template>
-  <div class="timeline scroll">
+  <div class="timeline scroll" @scroll="handleScroll">
     <div class="text-center">
       <b-spinner v-if="statuses.data.length === 0" small></b-spinner>
     </div>
+    <b-row v-if="newStatuses.length > 0" class="text-center" style="margin: 0;">
+      <b-col class="timeline-new-status-notification" @click="handleShowNewStatus"><span class="menu-item-text">{{newStatuses.length}}条新消息</span></b-col>
+    </b-row>
     <div v-for="status in statuses.data" :key="status.id">
       <Status v-if="!status.isDelete" :data="status" @action="handleAction"/>
     </div>
@@ -40,6 +43,14 @@
   overflow-y: scroll;
   height: 450px;
 }
+.timeline-new-status-notification {
+  cursor: pointer;
+  height: 30px;
+  border: 1px solid black;
+  margin: 2px;
+  background-color: #2e317c;
+  color: white;
+}
 </style>
 
 <script>
@@ -55,6 +66,7 @@ export default {
         data: [],
         cache: {}
       },
+      newStatuses: [],
       modal: {
         show: false,
         type: '',
@@ -66,27 +78,73 @@ export default {
         status: ''
       },
       lastId: '',
-      textareaClass: 'textarea'
+      textareaClass: 'textarea',
+      requesting: {
+        new: false,
+        old: false
+      }
     }
   },
   computed: {
     count() {
       return 140 - this.input.status.length
+    },
+    newestStatus() {
+      return this.statuses.data[0]
+    },
+    oldestStatus() {
+      return this.statuses.data[this.statuses.data.length - 1]
+    }
+  },
+  watch: {
+    '$store.state.status.updateTime'() {
+      if (this.$store.state.status.updateTime !== 0) {
+        this.getNewStatus()
+      }
     }
   },
   mounted() {
     this.initTimeline()
+    this.setInterval()
   },
   methods: {
     initTimeline() {
+      this.requesting = {
+        new: true,
+        old: true
+      }
       this.$store.dispatch('InitTimeline').then((res) => {
-        this.statuses.cache = {}
-        this.statuses.data = res.map((item, index) => {
-          this.statuses.cache[item.id] = index
-          item.isDelete = false
-          return item
-        })
+        this.statuses.data = res
+        this.requesting = {
+          new: false,
+          old: false
+        }
       })
+    },
+    getNewStatus() {
+      if (!this.requesting.new) {
+        this.requesting.new = true
+        this.$store.dispatch('GetNewStatus', { since_id: this.newestStatus.id }).then((res) => {
+          this.newStatuses = res
+          this.requesting.new = false
+        })
+      }
+    },
+    getMoreStatus() {
+      if (!this.requesting.old) {
+        this.requesting.old = true
+        this.$store.dispatch('GetNewStatus', { max_id: this.oldestStatus.id, count: 10 }).then((res) => {
+          for (let i = 0; i < res.length; i++) {
+            this.statuses.data.push(res[i])
+          }
+          this.requesting.old = false
+        })
+      }
+    },
+    setInterval() {
+      setInterval(() => {
+        this.getNewStatus()
+      }, 10 * 1000)
     },
     setModal(type, data) {
       console.log(type, data)
@@ -154,7 +212,11 @@ export default {
     },
     handleConfirm() {
       this.$store.dispatch('DestroyStatus', {id: this.modal.data.id})
-      this.statuses.data[this.statuses.cache[this.modal.data.id]].isDelete = true
+      for (let i = this.statuses.data.length - 1; i >= 0; i--) {
+        if (this.statuses.data[i].id === this.modal.data.id) {
+          this.statuses.data[i].isDelete = true
+        }
+      }
       this.resetModal()
     },
     handleCancel() {
@@ -167,10 +229,25 @@ export default {
     handleFavorite(data) {
       if (data.favorited) {
         this.$store.dispatch('Favorite', {id: data.id, destroy: true, userId: data.user.id})
-        this.statuses.data[this.statuses.cache[data.id]].favorited = false
       } else {
         this.$store.dispatch('Favorite', {id: data.id, userId: data.user.id})
-        this.statuses.data[this.statuses.cache[data.id]].favorited = true
+      }
+      for (let i = this.statuses.data.length - 1; i >= 0; i--) {
+        if (this.statuses.data[i].id === this.modal.data.id) {
+          this.statuses.data[i].favorited = !this.statuses.data[i].favorited
+        }
+      }
+    },
+    handleShowNewStatus() {
+      for (let i = this.newStatuses.length - 1; i >= 0; i--) {
+        this.statuses.data.unshift(this.newStatuses[i])
+        this.newStatuses.pop()
+      }
+    },
+    handleScroll() {
+      const position = Math.floor((this.$el.scrollTop / this.$el.scrollHeight) * 100)
+      if (position > 80) {
+        this.getMoreStatus()
       }
     }
   }
