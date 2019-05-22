@@ -4,12 +4,12 @@
       <b-img :src="data.user.profile_image_url" width="48"/>
     </div>
     <b-col class="status-middle">
-      <p class="status-name"><b>{{data.user.name}}</b></p>
+      <p class="status-name"><b>{{data.user.name}}</b><span class="status-time">{{setTime(data.created_at)}}</span></p>
       <b-row class="status-content">
         <b-col style="padding: 0 10px 0 0;">
           <p>{{data.text}}</p>
         </b-col>
-        <a>
+        <a @click="handlePhotoClick(data.photo)">
           <b-img v-if="data.photo" class="status-photo" :src="data.photo.thumburl"/>
         </a>
       </b-row>
@@ -86,8 +86,14 @@
 .status-photo-container {
   padding-left: 10px;
 }
+.status-time {
+  margin-left: 10px;
+  font-size: 10px;
+}
 </style>
 <script>
+import T from '@/assets/T'
+import electron from 'electron'
 export default {
   name: 'Status',
   props: {
@@ -99,8 +105,34 @@ export default {
     }
   },
   methods: {
+    setTime(time) {
+      const timestamp = new Date(time)
+      return T.setTime(timestamp, 'YMDHmN')
+    },
     handleAction(type) {
       this.$emit('action', type, this.data)
+    },
+    handlePhotoClick(data) {
+      const largePhoto = new Image()
+      largePhoto.onload = function () {
+        let win = new electron.remote.BrowserWindow({
+          width: largePhoto.width,
+          height: largePhoto.height,
+          autoHideMenuBar: true,
+          show: false,
+          webPreferences: {
+            devTools: false
+          }
+        })
+        win.on('close', function () {
+          win = null;
+        })
+        win.once('ready-to-show', () => {
+          win.show()
+        })
+        win.loadURL(largePhoto.src)
+      };
+      largePhoto.src = data.largeurl
     }
   }
 }
