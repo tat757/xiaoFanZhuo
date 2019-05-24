@@ -3,6 +3,7 @@
     <b-row class="text-center">
       <b-col :class="getClass('timeline')" @click="handleRedirct('timeline')"><span class="menu-item-text">首页</span></b-col>
       <b-col :class="getClass('mention')" @click="handleRedirct('mention')"><span class="menu-item-text">@提到我的</span></b-col>
+      <b-col :class="getClass('direct')" @click="handleRedirct('direct')"><span class="menu-item-text">私信</span></b-col>
     </b-row>
   </div>
 </template>
@@ -15,6 +16,7 @@
   background-color: rgba(208, 217, 236, 0.5);
   cursor: pointer;
   height: 40px;
+  border-right: 1px solid white;
 }
 .menu-item:hover {
   background-color: rgba(208, 217, 236, 1);

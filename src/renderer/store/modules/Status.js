@@ -87,7 +87,7 @@ const status = {
         })
       })
     },
-    GetNewStatus(context, params) {
+    GetNewMention(context, params) {
       return new Promise((resolve, reject) => {
         fanfou.get('/statuses/mentions', params).then((res) => {
           resolve(res)

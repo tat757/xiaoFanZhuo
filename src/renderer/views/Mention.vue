@@ -28,7 +28,9 @@ export default {
       requesting: {
         new: false,
         old: false
-      }
+      },
+      interval: null,
+      destroyed: false
     }
   },
   watch: {
@@ -49,6 +51,10 @@ export default {
   mounted() {
     this.initTimeline()
     this.setInterval()
+  },
+  destroyed() {
+    clearInterval(this.interval)
+    this.destroyed = true
   },
   methods: {
     initTimeline() {
@@ -87,7 +93,9 @@ export default {
     },
     setInterval() {
       setInterval(() => {
-        this.getNewStatus()
+        if (!this.destroyed) {
+          this.getNewStatus()
+        }
       }, 10 * 1000)
     },
     handleDestroyStatus(params) {

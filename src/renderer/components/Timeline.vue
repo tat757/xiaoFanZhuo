@@ -107,7 +107,6 @@ export default {
   },
   watch: {
     updateTime() {
-      console.log(this.statuses)
       this.statuses.push({})
       this.statuses.pop()
     }
