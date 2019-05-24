@@ -1,12 +1,12 @@
 <template>
   <div class="timeline scroll" @scroll="handleScroll">
     <div class="text-center">
-      <b-spinner v-if="statuses.data.length === 0" small></b-spinner>
+      <b-spinner v-if="statuses.length === 0" small></b-spinner>
     </div>
     <b-row v-if="newStatuses.length > 0" class="text-center" style="margin: 0;">
       <b-col class="timeline-new-status-notification" @click="handleShowNewStatus"><span class="menu-item-text">{{newStatuses.length}}条新消息</span></b-col>
     </b-row>
-    <div v-for="status in statuses.data" :key="status.id">
+    <div v-for="status in statuses" :key="status.id">
       <Status v-if="!status.isDelete" :data="status" @action="handleAction"/>
     </div>
     <b-modal
@@ -60,13 +60,28 @@ export default {
   components: {
     Status
   },
+  props: {
+    statuses: {
+      type: Array,
+      default() {
+        return []
+      }
+    },
+    newStatuses: {
+      type: Array,
+      default() {
+        return []
+      }
+    },
+    updateTime: {
+      type: Number,
+      default() {
+        return 0
+      }
+    }
+  },
   data() {
     return {
-      statuses: {
-        data: [],
-        cache: {}
-      },
-      newStatuses: [],
       modal: {
         show: false,
         type: '',
@@ -88,58 +103,21 @@ export default {
   computed: {
     count() {
       return 140 - this.input.status.length
-    },
-    newestStatus() {
-      return this.statuses.data[0]
-    },
-    oldestStatus() {
-      return this.statuses.data[this.statuses.data.length - 1]
     }
   },
   watch: {
-    '$store.state.status.updateTime'() {
-      if (this.$store.state.status.updateTime !== 0) {
-        this.getNewStatus()
-      }
+    updateTime() {
+      console.log(this.statuses)
+      this.statuses.push({})
+      this.statuses.pop()
     }
   },
-  mounted() {
-    this.initTimeline()
-    this.setInterval()
-  },
   methods: {
-    initTimeline() {
-      this.requesting = {
-        new: true,
-        old: true
-      }
-      this.$store.dispatch('InitTimeline').then((res) => {
-        this.statuses.data = res
-        this.requesting = {
-          new: false,
-          old: false
-        }
-      })
-    },
     getNewStatus() {
-      if (!this.requesting.new) {
-        this.requesting.new = true
-        this.$store.dispatch('GetNewStatus', { since_id: this.newestStatus.id }).then((res) => {
-          this.newStatuses = res
-          this.requesting.new = false
-        })
-      }
+      this.$emit('getNewStatus')
     },
     getMoreStatus() {
-      if (!this.requesting.old) {
-        this.requesting.old = true
-        this.$store.dispatch('GetNewStatus', { max_id: this.oldestStatus.id, count: 10 }).then((res) => {
-          for (let i = 0; i < res.length; i++) {
-            this.statuses.data.push(res[i])
-          }
-          this.requesting.old = false
-        })
-      }
+      this.$emit('getMoreStatus')
     },
     setInterval() {
       setInterval(() => {
@@ -147,7 +125,6 @@ export default {
       }, 10 * 1000)
     },
     setModal(type, data) {
-      console.log(type, data)
       this.resetModal()
       this.modal.type = type
       this.modal.data = data
@@ -211,38 +188,30 @@ export default {
       }
     },
     handleConfirm() {
-      this.$store.dispatch('DestroyStatus', {id: this.modal.data.id})
-      for (let i = this.statuses.data.length - 1; i >= 0; i--) {
-        if (this.statuses.data[i].id === this.modal.data.id) {
-          this.statuses.data[i].isDelete = true
-        }
-      }
+      this.$emit('destroyStatus', {id: this.modal.data.id})
       this.resetModal()
     },
     handleCancel() {
       this.resetModal()
     },
     handleStatus(type) {
-      this.$store.dispatch('NewStatus', this.input)
+      this.$emit('newStatus', this.input)
       this.resetModal()
     },
     handleFavorite(data) {
+      let params = {}
       if (data.favorited) {
-        this.$store.dispatch('Favorite', {id: data.id, destroy: true, userId: data.user.id})
+        params = {id: data.id, destroy: true, userId: data.user.id}
       } else {
-        this.$store.dispatch('Favorite', {id: data.id, userId: data.user.id})
+        params = {id: data.id, userId: data.user.id}
       }
-      for (let i = this.statuses.data.length - 1; i >= 0; i--) {
-        if (this.statuses.data[i].id === this.modal.data.id) {
-          this.statuses.data[i].favorited = !this.statuses.data[i].favorited
-        }
-      }
+      this.$emit('favorite', params)
     },
     handleShowNewStatus() {
       for (let i = this.newStatuses.length - 1; i >= 0; i--) {
-        this.statuses.data.unshift(this.newStatuses[i])
-        this.newStatuses.pop()
+        this.statuses.unshift(this.newStatuses[i])
       }
+      this.$emit('showNewStatus')
     },
     handleScroll() {
       const position = Math.floor((this.$el.scrollTop / this.$el.scrollHeight) * 100)

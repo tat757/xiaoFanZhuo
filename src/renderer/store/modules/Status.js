@@ -22,6 +22,18 @@ const status = {
         })
       })
     },
+    InitMention() {
+      return new Promise((resolve, reject) => {
+        const option = {
+          count: 20
+        }
+        fanfou.get('/statuses/mentions', option).then((res) => {
+          resolve(res)
+        }).catch((err) => {
+          console.log(err)
+        })
+      })
+    },
     NewStatus(context, params) {
       return new Promise((resolve, reject) => {
         fanfou.post('/statuses/update', params).then((res) => {
@@ -69,6 +81,15 @@ const status = {
     GetNewStatus(context, params) {
       return new Promise((resolve, reject) => {
         fanfou.get('/statuses/home_timeline', params).then((res) => {
+          resolve(res)
+        }).catch((err) => {
+          console.log(err)
+        })
+      })
+    },
+    GetNewStatus(context, params) {
+      return new Promise((resolve, reject) => {
+        fanfou.get('/statuses/mentions', params).then((res) => {
           resolve(res)
         }).catch((err) => {
           console.log(err)

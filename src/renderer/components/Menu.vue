@@ -28,9 +28,9 @@
 <script>
 export default {
   name: 'Menu',
-  data() {
-    return {
-      active: 'timeline'
+  computed: {
+    active() {
+      return this.$route.path.split('/')[1]
     }
   },
   methods: {
@@ -42,7 +42,7 @@ export default {
       return classList
     },
     handleRedirct(url) {
-      this.active = url
+      this.$router.push('/' + url)
     }
   }
 }

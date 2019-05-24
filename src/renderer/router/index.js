@@ -2,7 +2,8 @@ import Vue from 'vue'
 import Router from 'vue-router'
 
 import Full from '../views/Full'
-import Timeline from '../views/Timeline'
+import Timeline from '../views/Homepage'
+import Mention from '../views/Mention'
 import Login from '../views/Login'
 
 Vue.use(Router)
@@ -17,8 +18,13 @@ export default new Router({
       children: [
         {
           path: 'timeline',
-          name: 'Timeline',
+          name: '时间轴',
           component: Timeline
+        },
+        {
+          path: 'mention',
+          name: '提到我的',
+          component: Mention
         }
       ]
     },
