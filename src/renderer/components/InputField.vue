@@ -69,17 +69,12 @@ export default {
       let params = {
         status: this.input
       }
-      if (!this.image) {
-        this.$store.dispatch('NewStatus', params).then((res) => {
-          this.input = ''
-        })
-      } else {
+      if (this.image) {
         params.photo = this.image
-        this.$store.dispatch('UploadPhoto', params).then((res) => {
-          this.input = ''
-          this.image = null
-        })
       }
+      this.$emit('newStatus', params)
+      this.input = ''
+      this.image = null
     },
     handleTextareaChange(data) {
       if (data.split('\n').length > 5) {

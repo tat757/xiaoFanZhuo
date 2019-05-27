@@ -1,5 +1,5 @@
 <template>
-  <div class="timeline scroll" @scroll="handleScroll">
+  <div v-if="height !== ''" class="timeline scroll" :style="{height: height}" @scroll="handleScroll">
     <div class="text-center">
       <b-spinner v-if="statuses.length === 0" small></b-spinner>
     </div>
@@ -41,7 +41,6 @@
 <style>
 .timeline {
   overflow-y: scroll;
-  height: 450px;
 }
 .timeline-new-status-notification {
   cursor: pointer;
@@ -77,6 +76,12 @@ export default {
       type: Number,
       default() {
         return 0
+      }
+    },
+    height: {
+      type: String,
+      default() {
+        return ''
       }
     }
   },
@@ -213,7 +218,7 @@ export default {
       this.$emit('showNewStatus')
     },
     handleScroll() {
-      const position = Math.floor((this.$el.scrollTop / this.$el.scrollHeight) * 100)
+      const position = Math.floor(((this.$el.scrollTop + 2123 - 1684) / this.$el.scrollHeight) * 100)
       if (position > 80) {
         this.getMoreStatus()
       }
@@ -221,4 +226,3 @@ export default {
   }
 }
 </script>
-

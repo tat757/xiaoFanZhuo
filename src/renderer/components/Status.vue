@@ -119,16 +119,12 @@ export default {
           width: largePhoto.width,
           height: largePhoto.height,
           autoHideMenuBar: true,
-          show: false,
           webPreferences: {
             devTools: false
           }
         })
         win.on('close', function () {
           win = null;
-        })
-        win.once('ready-to-show', () => {
-          win.show()
         })
         win.loadURL(largePhoto.src)
       };

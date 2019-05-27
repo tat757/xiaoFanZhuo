@@ -4,6 +4,7 @@
       :statuses="statuses"
       :newStatuses="newStatuses"
       :updateTime="updateTime"
+      :height="timelineHeight"
       @getNewStatus="getNewStatus"
       @getMoreStatus="getMoreStatus"
       @showNewStatus="newStatuses = []"
@@ -30,7 +31,8 @@ export default {
         old: false
       },
       interval: null,
-      destroyed: false
+      destroyed: false,
+      timelineHeight: ''
     }
   },
   watch: {
@@ -49,6 +51,7 @@ export default {
     }
   },
   mounted() {
+    this.timelineHeight = this.$el.clientHeight + 'px'
     this.initTimeline()
     this.setInterval()
   },

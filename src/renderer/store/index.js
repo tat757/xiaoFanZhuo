@@ -5,13 +5,15 @@ import { createPersistedState, createSharedMutations } from 'vuex-electron'
 
 import account from './modules/Account'
 import status from './modules/Status'
+import direct from './modules/Direct'
 
 Vue.use(Vuex)
 
 const store = new Vuex.Store({
   modules: {
     account,
-    status
+    status,
+    direct
   },
   plugins: [
     createPersistedState(),

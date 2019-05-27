@@ -23,7 +23,6 @@ function createWindow () {
     autoHideMenuBar: true,
     backgroundColor: 'white'
   })
-
   mainWindow.loadURL(winURL)
 
   mainWindow.on('closed', () => {

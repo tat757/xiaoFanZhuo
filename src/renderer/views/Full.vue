@@ -1,14 +1,11 @@
 <template>
   <div class="full">
-    <InputField/>
+    <InputField @newStatus="handleNewStatus"/>
     <Menu/>
-    <router-view/>
+    <router-view :style="{ height: bottomHeight + 'px' }"/>
   </div>
 </template>
 <style>
-.full {
-  background-color: #F9FAFC;
-}
 </style>
 <script>
 import InputField from '../components/InputField'
@@ -19,12 +16,24 @@ export default {
     InputField,
     Menu
   },
+  computed: {
+    bottomHeight() {
+      return require('electron').remote.getCurrentWindow().getContentSize()[1] - 162
+    }
+  },
   mounted() {
     this.getCurrUser()
   },
   methods: {
     getCurrUser() {
       this.$store.dispatch('GetCurrUser')
+    },
+    handleNewStatus(data) {
+      if (!data.photo) {
+        this.$store.dispatch('NewStatus', data)
+      } else {
+        this.$store.dispatch('UploadPhoto', data)
+      }
     }
   }
 }
