@@ -1,10 +1,13 @@
 <template>
   <b-row no-gutters>
     <div class="input-field-left">
-      <b-img :src="avatar" width="48" height="48"/>
-      <div style="margin-top: 3px">
-        <b-button size="sm" @click="handleLogout">x</b-button>
-      </div>
+      <b-dropdown variant="link" toggle-class="text-decoration-none" no-caret id="menu">
+        <template slot="button-content">
+          <b-img :src="avatar" width="48" height="48"/>
+        </template>
+        <b-dropdown-item @click="handleRedirect('/profile')">个人首页</b-dropdown-item>
+        <b-dropdown-item @click="handleLogout">注销</b-dropdown-item>
+      </b-dropdown>
     </div>
     <b-col class="input-field-right">
       <b-form-textarea
@@ -26,6 +29,13 @@
   </b-row>
 </template>
 <style>
+#menu a{
+  font-size: 12px;
+}
+#menu button{
+  padding: 0;
+  margin: 0;
+}
 .input-field-left {
   margin: 4px 5px 0 5px;
 }
@@ -45,7 +55,8 @@ export default {
     return {
       input: '',
       image: null,
-      textareaClass: 'textarea'
+      textareaClass: 'textarea',
+      showMenu: false
     }
   },
   computed: {
@@ -82,6 +93,9 @@ export default {
       } else {
         this.textareaClass = 'textarea'
       }
+    },
+    handleRedirect(path) {
+      this.$router.push(path)
     }
   }
 }

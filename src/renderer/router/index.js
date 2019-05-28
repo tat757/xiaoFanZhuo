@@ -6,6 +6,7 @@ import Timeline from '../views/Homepage'
 import Mention from '../views/Mention'
 import Direct from '../views/Direct'
 import Login from '../views/Login'
+import Profile from '../views/Profile'
 
 Vue.use(Router)
 
@@ -33,6 +34,11 @@ export default new Router({
           component: Direct
         }
       ]
+    },
+    {
+      path: '/profile',
+      name: 'profile',
+      component: Profile
     },
     {
       path: '/login',

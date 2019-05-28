@@ -1,7 +1,7 @@
 <template>
   <div class="full">
     <InputField @newStatus="handleNewStatus"/>
-    <Menu/>
+    <Menu :menu="menu" :active="active" @redirect="handleRedirect"/>
     <router-view :style="{ height: bottomHeight + 'px' }"/>
   </div>
 </template>
@@ -16,24 +16,38 @@ export default {
     InputField,
     Menu
   },
+  data() {
+    return {
+      menu: [{
+        key: 'timeline',
+        label: '首页'
+      }, {
+        key: 'mention',
+        label: '@提到我的'
+      }]
+    }
+  },
   computed: {
     bottomHeight() {
       return require('electron').remote.getCurrentWindow().getContentSize()[1] - 162
+    },
+    active() {
+      return this.$route.path.split('/')[1]
     }
   },
   mounted() {
-    this.getCurrUser()
+    this.$store.dispatch('GetUserInfo')
   },
   methods: {
-    getCurrUser() {
-      this.$store.dispatch('GetCurrUser')
-    },
     handleNewStatus(data) {
       if (!data.photo) {
         this.$store.dispatch('NewStatus', data)
       } else {
         this.$store.dispatch('UploadPhoto', data)
       }
+    },
+    handleRedirect(path) {
+      this.$router.push('/' + path)
     }
   }
 }

@@ -110,6 +110,7 @@ export default {
       return T.setTime(timestamp, 'YMDHmN')
     },
     handleAction(type) {
+      console.log(this.data)
       this.$emit('action', type, this.data)
     },
     handlePhotoClick(data) {

@@ -1,8 +1,7 @@
 <template>
   <div>
     <b-row class="text-center">
-      <b-col :class="getClass('timeline')" @click="handleRedirct('timeline')"><span class="menu-item-text">首页</span></b-col>
-      <b-col :class="getClass('mention')" @click="handleRedirct('mention')"><span class="menu-item-text">@提到我的</span></b-col>
+      <b-col v-for="item in menu" :key="item.key" :class="getClass(item.key)" @click="handleRedirct(item.key)"><span class="menu-item-text">{{item.label}}</span></b-col>
     </b-row>
   </div>
 </template>
@@ -29,9 +28,18 @@
 <script>
 export default {
   name: 'Menu',
-  computed: {
-    active() {
-      return this.$route.path.split('/')[1]
+  props: {
+    menu: {
+      type: Array,
+      default() {
+        return []
+      }
+    },
+    active: {
+      type: String,
+      default() {
+        return ''
+      }
     }
   },
   methods: {
@@ -43,7 +51,7 @@ export default {
       return classList
     },
     handleRedirct(url) {
-      this.$router.push('/' + url)
+      this.$emit('redirect', url)
     }
   }
 }
