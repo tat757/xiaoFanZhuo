@@ -2,7 +2,7 @@
   <div>
     <div v-if="user['profile_background_image_url']" class="profile-header" :style="{background: 'url(' + user['profile_background_image_url'] + ')', 'background-size': 'cover'}">
       <div class="profile-info-container">
-      <span class="text-button" @click="handleRedirect('/timeline')">返回</span>
+        <span class="text-button" @click="handleRedirect('/timeline')">返回</span>
         <b-img :src="user['profile_image_origin_large']" class="profile-photo"/>
         <p class="profile-name">{{user.name}}</p>
         <span v-if="user.id" class="text-tag">id：{{user.id}}</span>
@@ -14,6 +14,8 @@
         <span class="text-button">被关注：{{user.followers_count}}</span>
       </div>
     </div>
+    <Menu :menu="menu" :active="active" @redirect="handleRedirect"/>
+    <router-view :style="{ height: bottomHeight + 'px' }"/>
   </div>
 </template>
 <style>
@@ -24,7 +26,7 @@
   height: 100%;
   width: 100%;
   padding: 20px;
-  background-color: rgba(0, 0, 0, 0.3)
+  background-color: rgba(90, 122, 188, 0.3)
 }
 .profile-photo {
   display: block;
@@ -40,19 +42,33 @@
 }
 </style>
 <script>
+import Menu from '../components/Menu'
 export default {
   name: 'Profile',
+  components: {
+    Menu
+  },
   data() {
     return {
-      user: {}
+      user: {},
+      menu: [{
+        key: 'timeline',
+        label: '时间轴'
+      }, {
+        key: 'photo',
+        label: '照片'
+      }, {
+        key: 'favorite',
+        label: '收藏'
+      }]
     }
   },
   computed: {
     bottomHeight() {
-      return require('electron').remote.getCurrentWindow().getContentSize()[1] - 162
+      return require('electron').remote.getCurrentWindow().getContentSize()[1] - 300
     },
     active() {
-      return this.$route.path.split('/')[1]
+      return this.$route.path.split('/')[2]
     }
   },
   mounted() {
@@ -61,7 +77,7 @@ export default {
   },
   methods: {
     getUserId() {
-      console.log(this.$route.params)
+      return this.$route.query.id
     },
     getUserInfo(id) {
       const params = {}
@@ -70,8 +86,6 @@ export default {
       }
       this.$store.dispatch('GetUserInfo', params).then((res) => {
         this.user = res
-        console.log(this.user['profile_image_url'])
-        console.log(res)
       })
     },
     handleRedirect(path) {

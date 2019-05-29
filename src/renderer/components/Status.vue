@@ -4,10 +4,17 @@
       <b-img :src="data.user.profile_image_url" width="48"/>
     </div>
     <b-col class="status-middle">
-      <p class="status-name"><b>{{data.user.name}}</b><span class="status-time">{{setTime(data.created_at)}}</span></p>
+      <p class="status-name"><b><span class="name-link" @click="handleNameClick(data.user.id)">{{data.user.name}}</span></b><span class="status-time">{{setTime(data.created_at)}}</span></p>
       <b-row class="status-content">
         <b-col style="padding: 0 10px 0 0;">
-          <p>{{data.text}}</p>
+          <p>
+            <span v-for="(item, index) in data.txt" :key="index">
+              <span v-if="item.type === 'at'" class="name-link" @click="handleNameClick(item.id)">
+                {{item.text}}
+              </span>
+              <span v-else>{{item.text}}</span>
+            </span>
+          </p>
         </b-col>
         <a @click="handlePhotoClick(data.photo)">
           <b-img v-if="data.photo" class="status-photo" :src="data.photo.thumburl"/>
@@ -110,7 +117,6 @@ export default {
       return T.setTime(timestamp, 'YMDHmN')
     },
     handleAction(type) {
-      console.log(this.data)
       this.$emit('action', type, this.data)
     },
     handlePhotoClick(data) {
@@ -130,6 +136,9 @@ export default {
         win.loadURL(largePhoto.src)
       };
       largePhoto.src = data.largeurl
+    },
+    handleNameClick(id) {
+      this.$emit('nameClick', id)
     }
   }
 }

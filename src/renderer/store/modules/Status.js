@@ -10,12 +10,23 @@ const status = {
     }
   },
   actions: {
-    InitTimeline() {
+    InitTimeline(context, options) {
+      options = options || {}
       return new Promise((resolve, reject) => {
-        const option = {
-          count: 20
+        const params = {
+          count: 20,
+          format: 'html'
         }
-        fanfou.get('/statuses/home_timeline', option).then((res) => {
+        let url = ''
+        if (options.isPerson) {
+          url = '/statuses/user_timeline'
+        } else {
+          url = '/statuses/home_timeline'
+        }
+        if (options.id) {
+          params.id = options.id
+        }
+        fanfou.get(url, params).then((res) => {
           resolve(res)
         }).catch((err) => {
           console.log(err)
@@ -79,8 +90,15 @@ const status = {
       })
     },
     GetNewStatus(context, params) {
+      params.format = 'html'
+      let url = ''
+      if (params.isPerson) {
+        url = '/statuses/user_timeline'
+      } else {
+        url = '/statuses/home_timeline'
+      }
       return new Promise((resolve, reject) => {
-        fanfou.get('/statuses/home_timeline', params).then((res) => {
+        fanfou.get(url, params).then((res) => {
           resolve(res)
         }).catch((err) => {
           console.log(err)

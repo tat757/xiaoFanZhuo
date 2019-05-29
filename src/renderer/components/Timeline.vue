@@ -7,7 +7,7 @@
       <b-col class="timeline-new-status-notification" @click="handleShowNewStatus"><span class="menu-item-text">{{newStatuses.length}}条新消息</span></b-col>
     </b-row>
     <div v-for="status in statuses" :key="status.id">
-      <Status v-if="!status.isDelete" :data="status" @action="handleAction"/>
+      <Status v-if="!status.isDelete" :data="status" @action="handleAction" @nameClick="(id) => {handleAction('nameClick', id)}"/>
     </div>
     <b-modal
       v-model="modal.show"
@@ -180,6 +180,8 @@ export default {
     handleAction(type, data) {
       if (type === 'favorite') {
         this.handleFavorite(data)
+      } else if (type === 'nameClick') {
+        this.$router.push('/profile/timeline?id=' + data)
       } else {
         this.setModal(type, data)
       }
