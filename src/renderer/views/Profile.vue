@@ -12,6 +12,7 @@
         <div class="break-line"/>
         <span class="text-button">关注：{{user.friends_count}}</span>
         <span class="text-button">被关注：{{user.followers_count}}</span>
+        <span v-if="userId === currUserId" class="text-button">私信</span>
       </div>
     </div>
     <Menu :menu="menu" :active="active" @redirect="handleRedirect"/>
@@ -51,6 +52,7 @@ export default {
   data() {
     return {
       user: {},
+      userId: '',
       menu: [{
         key: 'timeline',
         label: '时间轴'
@@ -67,17 +69,20 @@ export default {
     bottomHeight() {
       return require('electron').remote.getCurrentWindow().getContentSize()[1] - 300
     },
+    currUserId() {
+      return this.$store.state.account.userId
+    },
     active() {
       return this.$route.path.split('/')[2]
     }
   },
   mounted() {
-    const userId = this.getUserId()
-    this.getUserInfo(userId)
+    this.userId = this.getUserId()
+    this.getUserInfo(this.userId)
   },
   methods: {
     getUserId() {
-      return this.$route.query.id
+      return this.$route.query.id || ''
     },
     getUserInfo(id) {
       const params = {}
@@ -89,7 +94,7 @@ export default {
       })
     },
     handleRedirect(path) {
-      this.$router.push('/' + path)
+      this.$router.push('/profile/' + path)
     }
   }
 }

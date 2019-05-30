@@ -89,6 +89,16 @@ const status = {
         })
       })
     },
+    GetFavorite(context, params) {
+      const url = '/favorites/' + params.id
+      return new Promise((resolve, reject) => {
+        fanfou.get(url, { page: params.page, format: 'html' }).then((res) => {
+          resolve(res)
+        }).catch((err) => {
+          console.log(err)
+        })
+      })
+    },
     GetNewStatus(context, params) {
       params.format = 'html'
       let url = ''

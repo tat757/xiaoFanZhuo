@@ -8,6 +8,8 @@ import Direct from '../views/Direct'
 import Login from '../views/Login'
 import Profile from '../views/Profile'
 import PersonTimeline from '../views/PersonTimeline'
+import PersonPhoto from '../views/PersonPhoto'
+import PersonFavorite from '../views/PersonFavorite'
 
 Vue.use(Router)
 
@@ -50,12 +52,12 @@ export default new Router({
         {
           path: 'photo',
           name: '提到我的',
-          component: Mention
+          component: PersonPhoto
         },
         {
-          path: 'direct',
-          name: '私信',
-          component: Direct
+          path: 'favorite',
+          name: '收藏',
+          component: PersonFavorite
         }
       ]
     },

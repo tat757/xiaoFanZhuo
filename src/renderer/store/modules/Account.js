@@ -2,7 +2,8 @@ import fanfou from '../../../api/request'
 
 const account = {
   state: {
-    avatar: ''
+    avatar: '',
+    userId: ''
   },
   mutations: {
     DECREMENT_MAIN_COUNTER (state) {
@@ -13,6 +14,9 @@ const account = {
     },
     SET_AVATAR (state, avatar) {
       state.avatar = avatar
+    },
+    SET_USERID (state, id) {
+      state.userId = id
     }
   },
   actions: {
@@ -42,7 +46,8 @@ const account = {
       return new Promise((resolve, reject) => {
         fanfou.get('/users/show', params).then((res) => {
           if (!params) {
-            context.commit('SET_AVATAR', res.profile_image_url)            
+            context.commit('SET_AVATAR', res.profile_image_url)
+            context.commit('SET_USERID', res.id)
           }
           resolve(res)
         }).catch((err) => {
