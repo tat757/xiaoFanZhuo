@@ -36,6 +36,9 @@ export default {
   },
   mounted() {
     this.personId = this.$route.query.id
+    if (!this.personId) {
+      this.personId = this.$store.state.account.userId
+    }
     this.timelineHeight = this.$el.clientHeight + 'px'
     this.initTimeline()
   },
@@ -45,13 +48,11 @@ export default {
         old: true
       }
       const params = {
-        page: this.currPage
+        page: this.currPage,
+        id: this.personId,
+        isFavorite: true
       }
-      if (this.personId !== '') {
-        params.id = this.personId
-      }
-      this.$store.dispatch('GetFavorite', params).then((res) => {
-        console.log(res)
+      this.$store.dispatch('InitTimeline', params).then((res) => {
         this.statuses = res
         this.requesting = {
           old: false
@@ -63,12 +64,11 @@ export default {
         this.currPage++
         this.requesting.old = true
         const params = {
-          page: this.currPage
+          page: this.currPage,
+          id: this.personId,
+          isFavorite: true
         }
-        if (this.personId !== '') {
-          params.id = this.personId
-        }
-        this.$store.dispatch('GetFavorite', params).then((res) => {
+        this.$store.dispatch('GetNewStatus', params).then((res) => {
           for (let i = 0; i < res.length; i++) {
             this.statuses.push(res[i])
             this.updateTime = Date.now()

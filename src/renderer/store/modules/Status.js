@@ -13,18 +13,21 @@ const status = {
     InitTimeline(context, options) {
       options = options || {}
       return new Promise((resolve, reject) => {
-        const params = {
+        let params = {
           count: 20,
           format: 'html'
+        }
+        if (options.id) {
+          params.id = options.id
         }
         let url = ''
         if (options.isPerson) {
           url = '/statuses/user_timeline'
+        } else if (options.isFavorite) {
+          url = '/favorites'
+          params = options
         } else {
           url = '/statuses/home_timeline'
-        }
-        if (options.id) {
-          params.id = options.id
         }
         fanfou.get(url, params).then((res) => {
           resolve(res)
@@ -104,6 +107,8 @@ const status = {
       let url = ''
       if (params.isPerson) {
         url = '/statuses/user_timeline'
+      } else if (params.isFavorite) {
+        url = '/favorites'
       } else {
         url = '/statuses/home_timeline'
       }
