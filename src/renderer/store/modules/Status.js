@@ -128,6 +128,15 @@ const status = {
           console.log(err)
         })
       })
+    },
+    GetUserPhotos(context, params) {
+      return new Promise((resolve, reject) => {
+        fanfou.get('/photos/user_timeline', params).then((res) => {
+          resolve(res)
+        }).catch((err) => {
+          console.log(err)
+        })
+      })
     }
   } 
 }

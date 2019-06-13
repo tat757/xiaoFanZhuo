@@ -219,7 +219,7 @@ export default {
       }
       this.$emit('showNewStatus')
     },
-    handleScroll() {
+    handleScroll(data) {
       const position = Math.floor(((this.$el.scrollTop + 2123 - 1684) / this.$el.scrollHeight) * 100)
       if (position > 80) {
         this.getMoreStatus()

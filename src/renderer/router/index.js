@@ -46,12 +46,12 @@ export default new Router({
       children: [
         {
           path: 'timeline',
-          name: '时间轴',
+          name: '个人时间轴',
           component: PersonTimeline
         },
         {
           path: 'photo',
-          name: '提到我的',
+          name: '照片',
           component: PersonPhoto
         },
         {
