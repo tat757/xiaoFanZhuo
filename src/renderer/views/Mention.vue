@@ -11,6 +11,7 @@
       @destroyStatus="handleDestroyStatus"
       @newStatus="handleNewStatus"
       @favorite="handleFavorite"
+      @nameClick="handleNameClick"
     />
   </div>
 </template>
@@ -121,6 +122,9 @@ export default {
           this.updateTime = Date.now()
         }
       }
+    },
+    handleNameClick(data) {
+      this.$router.push('/profile/timeline/' + data)
     }
   }
 }

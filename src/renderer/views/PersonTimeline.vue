@@ -6,6 +6,8 @@
       @getMoreStatus="getMoreStatus"
       @newStatus="handleNewStatus"
       @favorite="handleFavorite"
+      @nameClick="handleNameClick"
+      @destroyStatus="handleDestroy"
     />
   </div>
 </template>
@@ -33,8 +35,14 @@ export default {
       return this.statuses[this.statuses.length - 1]
     }
   },
+  watch: {
+    '$route.path'() {
+      this.personId = this.$route.params.id
+      this.initTimeline()
+    }
+  },
   mounted() {
-    this.personId = this.$route.query.id
+    this.personId = this.$route.params.id
     this.timelineHeight = this.$el.clientHeight + 'px'
     this.initTimeline()
   },
@@ -87,6 +95,17 @@ export default {
           this.updateTime = Date.now()
         }
       }
+    },
+    handleNameClick(data) {
+      if (data !== this.personId) {
+        this.statuses = []
+      }
+      this.$router.push('/profile/timeline/' + data)
+    },
+    handleDestroy(params) {
+      this.$store.dispatch('DestroyStatus', params).then((res) => {
+        this.initTimeline()
+      })
     }
   }
 }

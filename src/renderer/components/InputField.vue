@@ -5,7 +5,7 @@
         <template slot="button-content">
           <b-img :src="avatar" width="48" height="48"/>
         </template>
-        <b-dropdown-item @click="handleRedirect('/profile')">个人首页</b-dropdown-item>
+        <b-dropdown-item @click="() => {handleRedirect('/profile/timeline/' + $store.state.account.userId)}">个人首页</b-dropdown-item>
         <b-dropdown-item @click="handleLogout">注销</b-dropdown-item>
       </b-dropdown>
     </div>

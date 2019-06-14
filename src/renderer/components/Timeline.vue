@@ -181,7 +181,7 @@ export default {
       if (type === 'favorite') {
         this.handleFavorite(data)
       } else if (type === 'nameClick') {
-        this.$router.push('/profile/timeline?id=' + data)
+        this.$emit('nameClick', data)
       } else {
         this.setModal(type, data)
       }

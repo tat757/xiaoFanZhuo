@@ -1,11 +1,14 @@
 <template>
   <div>
-    <Timeline
+    <p v-if="noStatus" style="text-align: center">无信息</p>
+    <Timeline v-else
       :statuses="statuses"
       :height="timelineHeight"
       @getMoreStatus="getMoreStatus"
       @newStatus="handleNewStatus"
       @favorite="handleFavorite"
+      @nameClick="handleNameClick"
+      @destroyStatus="handleDestroy"
     />
   </div>
 </template>
@@ -26,7 +29,8 @@ export default {
       },
       timelineHeight: '',
       personId: '',
-      currPage: 1
+      currPage: 1,
+      noStatus: false
     }
   },
   computed: {
@@ -35,7 +39,7 @@ export default {
     }
   },
   mounted() {
-    this.personId = this.$route.query.id
+    this.personId = this.$route.params.id
     if (!this.personId) {
       this.personId = this.$store.state.account.userId
     }
@@ -53,6 +57,9 @@ export default {
         isFavorite: true
       }
       this.$store.dispatch('InitTimeline', params).then((res) => {
+        if (res.length === 0) {
+          this.noStatus = true
+        }
         this.statuses = res
         this.requesting = {
           old: false
@@ -88,6 +95,14 @@ export default {
           this.updateTime = Date.now()
         }
       }
+    },
+    handleNameClick(data) {
+      this.$router.push('/profile/timeline/' + data)
+    },
+    handleDestroy(params) {
+      this.$store.dispatch('DestroyStatus', params).then((res) => {
+        this.initTimeline()
+      })
     }
   }
 }

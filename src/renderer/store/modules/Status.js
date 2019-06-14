@@ -2,16 +2,44 @@ import fanfou from '../../../api/request'
 
 const status = {
   state: {
-    updateTime: 0
+    updateTime: 0,
+    cache: {}
+  },
+  getters: {
+    getCache(state) {
+      return (id) => {
+        return state.cache[id]
+      }
+    }
   },
   mutations: {
     setUpdateTime(state, time) {
       state.updateTime = time
+    },
+    setCache(state, status) {
+      if (!status) {
+        state.cache = {}
+      } else {
+        for (let i = status.length - 1; i >= 0; i--) {
+          state.cache[status[i].id] = status[i]
+        }
+      }
+    },
+    setCacheFavorited(state, status) {
+      state.cache[status.id].favorited = status.favorited
+    },
+    removeCache(state, id) {
+      if (!id) {
+        state.cache = {}
+      } else {
+        state.cache[id] = null
+      }
     }
   },
   actions: {
     InitTimeline(context, options) {
       options = options || {}
+      context.commit('setCache')
       return new Promise((resolve, reject) => {
         let params = {
           count: 20,
@@ -30,8 +58,10 @@ const status = {
           url = '/statuses/home_timeline'
         }
         fanfou.get(url, params).then((res) => {
+          context.commit('setCache', res)
           resolve(res)
         }).catch((err) => {
+          reject(err)
           console.log(err)
         })
       })
@@ -61,6 +91,7 @@ const status = {
     DestroyStatus(context, params) {
       return new Promise((resolve, reject) => {
         fanfou.post('/statuses/destroy', params).then((res) => {
+          context.commit('removeCache', params.id)
           resolve(res)
         }).catch((err) => {
           console.log(err)
@@ -76,6 +107,7 @@ const status = {
           url = '/favorites/create/' + params.userId
         }
         fanfou.post(url, {id: params.id}).then((res) => {
+          context.commit('setCacheFavorited', res)
           resolve(res)
         }).catch((err) => {
           console.log(err)
@@ -114,6 +146,7 @@ const status = {
       }
       return new Promise((resolve, reject) => {
         fanfou.get(url, params).then((res) => {
+          context.commit('setCache', res)
           resolve(res)
         }).catch((err) => {
           console.log(err)
@@ -130,8 +163,10 @@ const status = {
       })
     },
     GetUserPhotos(context, params) {
+      params.format = 'html'
       return new Promise((resolve, reject) => {
         fanfou.get('/photos/user_timeline', params).then((res) => {
+          context.commit('setCache', res)
           resolve(res)
         }).catch((err) => {
           console.log(err)

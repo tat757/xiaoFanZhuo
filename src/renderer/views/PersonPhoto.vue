@@ -23,6 +23,7 @@
 }
 </style>
 <script>
+import electron from 'electron'
 export default {
   name: 'PersonPhoto',
   data() {
@@ -47,7 +48,7 @@ export default {
       this.getPersonPhotos()
     },
     getUserId() {
-      this.userId = this.$route.query.id
+      this.userId = this.$route.params.id
     },
     getPersonPhotos() {
       if (!this.loading) {
@@ -83,7 +84,20 @@ export default {
       }
     },
     handlePhotoClick(item) {
-      console.log(item)
+      let win = new electron.remote.BrowserWindow({
+        width: 546,
+        height: 500 + 200,
+        autoHideMenuBar: true,
+        parent: electron.remote.getCurrentWindow(),
+        webPreferences: {
+          devTools: true
+        }
+      })
+      win.on('close', function () {
+        win = null;
+      })
+      const href = window.location.href
+      win.loadURL(href.substring(0, href.indexOf('#') + 1) + '/photoStatus/' + item.id)
     },
     handleScroll(data) {
       const scrollPosition = Math.floor((data.srcElement.scrollTop / data.srcElement.scrollHeight) * 100)

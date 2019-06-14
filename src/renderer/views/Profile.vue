@@ -2,7 +2,7 @@
   <div>
     <div v-if="user['profile_background_image_url']" class="profile-header" :style="{background: 'url(' + user['profile_background_image_url'] + ')', 'background-size': 'cover'}">
       <div class="profile-info-container">
-        <span class="text-button" @click="handleRedirect('/timeline')">返回</span>
+        <span class="text-button" @click="() => {$router.push('/timeline')}">返回</span>
         <b-img :src="user['profile_image_origin_large']" class="profile-photo"/>
         <p class="profile-name">{{user.name}}</p>
         <span v-if="user.id" class="text-tag">id：{{user.id}}</span>
@@ -76,13 +76,19 @@ export default {
       return this.$route.path.split('/')[2]
     }
   },
+  watch: {
+    '$route.path'() {
+      this.userId = this.getUserId()
+      this.getUserInfo(this.userId)
+    }
+  },
   mounted() {
     this.userId = this.getUserId()
     this.getUserInfo(this.userId)
   },
   methods: {
     getUserId() {
-      return this.$route.query.id || ''
+      return this.$route.params.id || ''
     },
     getUserInfo(id) {
       const params = {}
@@ -94,7 +100,7 @@ export default {
       })
     },
     handleRedirect(path) {
-      this.$router.push('/profile/' + path)
+      this.$router.push('/profile/' + path + '/' + this.userId)
     }
   }
 }

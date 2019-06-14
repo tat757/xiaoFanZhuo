@@ -11,6 +11,8 @@ import PersonTimeline from '../views/PersonTimeline'
 import PersonPhoto from '../views/PersonPhoto'
 import PersonFavorite from '../views/PersonFavorite'
 
+import PhotoStatus from '../views/PhotoStatus'
+
 Vue.use(Router)
 
 export default new Router({
@@ -45,17 +47,17 @@ export default new Router({
       component: Profile,
       children: [
         {
-          path: 'timeline',
+          path: 'timeline/:id',
           name: '个人时间轴',
           component: PersonTimeline
         },
         {
-          path: 'photo',
+          path: 'photo/:id',
           name: '照片',
           component: PersonPhoto
         },
         {
-          path: 'favorite',
+          path: 'favorite/:id',
           name: '收藏',
           component: PersonFavorite
         }
@@ -65,6 +67,11 @@ export default new Router({
       path: '/login',
       name: 'login',
       component: Login,
+    },
+    {
+      path: '/photoStatus/:id',
+      name: '测试',
+      component: PhotoStatus
     },
     {
       path: '*',
