@@ -1,15 +1,19 @@
 <template>
-  <div :class="{ direct: hasScroll, scroll: hasScroll }">
-    私信 <span class="text-button">返回</span>
-    <div v-if="conversations.length > 0">
+  <div>
+    <div>
+      <p style="margin: 8px">私信 <span class="text-button">返回</span></p>
+    </div>
+    <div v-if="conversations.length > 0" :class="{ direct: hasScroll, scroll: hasScroll }" :style="{ height: viewHeight }" @scroll="handleScroll">
       <b-row v-for="conversation in conversations" :key="conversation.otherid" :class="{ 'direct-conversation': true, 'direct-new': conversation.new_conv}" style="margin: 0;">
-        <div class="direct-avatar">
-          <b-img :src="conversation.avatar" width="48"/>
-        </div>
-        <div class="direct-content">
-          <p>{{conversation.name}}<span>{{conversation.time}}</span></p>
-          <p>{{conversation.text}}</p>
-        </div>
+        <a @click="handleOpenConversation(conversation)">
+          <div class="direct-avatar">
+            <b-img :src="conversation.avatar" width="48"/>
+          </div>
+          <div class="direct-content">
+            <p>{{conversation.name}}<span>{{conversation.time}}</span></p>
+            <p>{{conversation.text}}</p>
+          </div>
+        </a>
       </b-row>
     </div>
   </div>
@@ -47,22 +51,27 @@
 </style>
 <script>
 import T from '@/assets/T'
+import electron from 'electron'
 export default {
-  name: 'direct',
+  name: 'MessageList',
   data() {
     return {
       conversations: [],
-      hasScroll: false
+      hasScroll: false,
+      viewHeight: 0
     }
   },
   mounted() {
-    this.hasScroll = this.$el.clientHeight > require('electron').remote.getCurrentWindow().getContentSize()[1]
     this.getConversations()
+    this.viewHeight = (electron.remote.getCurrentWindow().getContentSize()[1] - 40) + 'px'
   },
   methods: {
     getConversations() {
-      this.$store.dispatch('GetDirectConversation').then((res) => {
+      this.$store.dispatch('GetMessageList').then((res) => {
         this.conversations = this.setData(res)
+        this.$nextTick().then(() => {
+          this.hasScroll = this.$el.clientHeight - 40 < require('electron').remote.getCurrentWindow().getContentSize()[1]
+        })
       })
     },
     setData(data) {
@@ -78,8 +87,15 @@ export default {
         item.time = T.setTime(item.dm.created_at, 'N')
         return item
       })
+    },
+    handleScroll(e) {
+      if (e.srcElement.scrollTop === e.srcElement.scrollHeight - e.srcElement.clientHeight) {
+        console.log('bottom')
+      }
+    },
+    handleOpenConversation(data) {
+      this.$router.push('/message/' + data.otherid)
     }
   }
 }
 </script>
-

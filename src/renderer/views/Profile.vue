@@ -12,7 +12,7 @@
         <div class="break-line"/>
         <span class="text-button">关注：{{user.friends_count}}</span>
         <span class="text-button">被关注：{{user.followers_count}}</span>
-        <span v-if="userId === currUserId" class="text-button">私信</span>
+        <span v-if="userId === currUserId" class="text-button" @click="() => {$router.push('/message')}">私信</span>
       </div>
     </div>
     <Menu :menu="menu" :active="active" @redirect="handleRedirect"/>

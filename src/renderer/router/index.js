@@ -11,6 +11,9 @@ import PersonTimeline from '../views/PersonTimeline'
 import PersonPhoto from '../views/PersonPhoto'
 import PersonFavorite from '../views/PersonFavorite'
 
+import MessageList from '../views/Message/index'
+import Message from '../views/Message/_id'
+
 import PhotoStatus from '../views/PhotoStatus'
 
 Vue.use(Router)
@@ -62,6 +65,16 @@ export default new Router({
           component: PersonFavorite
         }
       ]
+    },
+    {
+      path: '/message',
+      name: 'MessageList',
+      component: MessageList
+    },
+    {
+      path: '/message/:id',
+      name: 'Message',
+      component: Message
     },
     {
       path: '/login',
