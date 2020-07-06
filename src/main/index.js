@@ -11,7 +11,7 @@ if (process.env.NODE_ENV !== 'development') {
 let mainWindow
 const winURL = process.env.NODE_ENV === 'development'
   ? `http://localhost:9080`
-  : `file://${__dirname}/index.html`
+  : `file://${__dirname}/index.ejs`
 
 function createWindow () {
   /**
@@ -21,7 +21,8 @@ function createWindow () {
     width: 521, 
     height: 640,
     autoHideMenuBar: true,
-    backgroundColor: 'white'
+    backgroundColor: 'white',
+    resizable: false
   })
   mainWindow.loadURL(winURL)
 
