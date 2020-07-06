@@ -89,9 +89,14 @@ export default {
     },
     handleTextareaChange(data) {
       if (data.split('\n').length > 5) {
-        this.textareaClass = 'scroll show-scroll-y'
+        this.textareaClass = {
+          scroll: true,
+          'show-scroll-y': true
+        }
       } else {
-        this.textareaClass = 'textarea'
+        this.textareaClass = {
+          textarea: true
+        }
       }
     },
     handleRedirect(path) {

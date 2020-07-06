@@ -4,7 +4,7 @@
       <b-img :src="data.user.profile_image_url" width="48"/>
     </div>
     <b-col class="status-middle">
-      <p class="status-name"><b><span class="name-link" @click="handleNameClick(data.user.id)">{{data.user.name}}</span></b><span class="status-time">{{setTime(data.created_at)}}</span></p>
+      <p class="status-name"><b><span class="name-link" @click="handleNameClick(data.user.id)">{{data.user.name}}</span></b><span class="status-time">{{createdTime}}</span></p>
       <b-row class="status-content">
         <b-col style="padding: 0 10px 0 0;">
           <p>
@@ -111,6 +111,28 @@ export default {
       }
     }
   },
+  data() {
+    return {
+      createdTime: '',
+      notDestoryed: true
+    }
+  },
+  created() {
+    const timestamp = new Date(this.data.created_at)
+    this.createdTime = T.setTime(timestamp, 'YMDHmN')
+    const timeout = () => {
+      this.createdTime = T.setTime(timestamp, 'YMDHmN')
+      setTimeout(() => {
+        if (this.notDestoryed) {
+          timeout()
+        }
+      }, 10000);
+    }
+    timeout()
+  },
+  beforeDestroy() {
+    this.notDestoryed = false
+  },
   methods: {
     setTime(time) {
       const timestamp = new Date(time)
@@ -120,11 +142,11 @@ export default {
       this.$emit('action', type, this.data)
     },
     handlePhotoClick(data) {
-      const largePhoto = new Image()
-      largePhoto.onload = function () {
+      const originPhoto = new Image()
+      originPhoto.onload = function () {
         let win = new electron.remote.BrowserWindow({
-          width: largePhoto.width,
-          height: largePhoto.height,
+          width: originPhoto.width,
+          height: originPhoto.height,
           autoHideMenuBar: true,
           webPreferences: {
             devTools: false
@@ -133,9 +155,9 @@ export default {
         win.on('close', function () {
           win = null;
         })
-        win.loadURL(largePhoto.src)
+        win.loadURL(originPhoto.src)
       };
-      largePhoto.src = data.largeurl
+      originPhoto.src = data.originurl
     },
     handleNameClick(id) {
       this.$emit('nameClick', id)
