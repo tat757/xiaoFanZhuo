@@ -1,22 +1,27 @@
 <template>
-  <div style="margin: 0 4px;">
+  <div class="photo-status">
     <div v-if="data">
       <div style="text-align: center;">
         <b-img :width="width" :height="height" :src="src"/>
       </div>
-      <p style="text-align: center;">
-        <span v-for="(item, index) in data.txt" :key="index">
-          <span v-if="item.type === 'at'" class="name-link" @click="handleNameClick(item.id)">
-            {{item.text}}
+      <div class="text-container">
+        <p class="content">
+          <span v-for="(item, index) in data.txt" :key="index">
+            <span v-if="item.type === 'at'" class="name-link" @click="handleNameClick(item.id)">
+              {{item.text}}
+            </span>
+            <span v-else>{{item.text}}</span>
           </span>
-          <span v-else>{{item.text}}</span>
-        </span>
-      </p>
-      <span v-if="data.is_self" class="text-button" @click="handleAction('delete')">删除</span>
-      <span v-else class="text-button" @click="handleAction('reply')">回复</span>
-      <span class="text-button" @click="handleAction('repost')">转发</span>
-      <span v-if="!data.favorited" class="text-button" @click="handleAction('favorite')">收藏</span>
-      <span v-else class="text-button" @click="handleAction('favorite')">取消</span>
+        </p>
+      </div>
+      <div class="button-container">
+        <span v-if="data.is_self" class="text-button" @click="handleAction('delete')">删除</span>
+        <span v-else class="text-button" @click="handleAction('reply')">回复</span>
+        <span class="text-button" @click="handleAction('repost')">转发</span>
+        <span v-if="!data.favorited" class="text-button" @click="handleAction('favorite')">收藏</span>
+        <span v-else class="text-button" @click="handleAction('favorite')">取消</span>
+        <span class="text-button" @click="handleAction('openOriginImage')">查看原图</span>
+      </div>
     </div>
     <b-modal
       v-model="modal.show"
@@ -47,10 +52,21 @@
   </div>
 </template>
 <style>
+.photo-status {
+  padding-bottom: 10px;
+}
+.photo-status .text-container{
+  padding: 0 10px;
+}
+.photo-status .text-container .content{
+  text-align: left;
+}
+.photo-status .button-container {
+  text-align: center;
+}
 </style>
 <script>
 import electron from 'electron'
-const ipcRenderer = electron.ipcRenderer
 export default {
   name: 'PhotoStatus',
   data() {
@@ -96,12 +112,13 @@ export default {
           width = Math.floor(521 / height * width)
           height = 521
         }
+        this.width = width
+        this.height = height
         this.$nextTick().then(() => {
-          const bounds = electron.remote.getCurrentWindow().getBounds()
-          bounds.height = height + 200
-          electron.remote.getCurrentWindow().setBounds(bounds)
-          this.width = width
-          this.height = height
+          let contentBounds = electron.remote.getCurrentWindow().getContentBounds()
+          contentBounds.height = document.getElementById('app').clientHeight
+          electron.remote.getCurrentWindow().setContentBounds(contentBounds)
+          electron.remote.getCurrentWindow().setResizable(false)
           this.src = largePhoto.src
         })
       }
@@ -222,6 +239,8 @@ export default {
       const data = this.data
       if (type === 'favorite') {
         this.handleFavorite(data)
+      } else if (type === 'openOriginImage') {
+        this.handleOpenOriginImage()
       } else {
         this.setModal(type, data)
       }
@@ -247,6 +266,24 @@ export default {
       electron.remote.getCurrentWindow().getParentWindow().loadURL(href.substring(0, href.indexOf('#') + 1) + path)
       electron.remote.getCurrentWindow().getParentWindow().focus()
       electron.remote.getCurrentWindow().close()
+    },
+    handleOpenOriginImage() {
+      const originPhoto = new Image()
+      originPhoto.onload = function () {
+        let win = new electron.remote.BrowserWindow({
+          width: originPhoto.width,
+          height: originPhoto.height,
+          autoHideMenuBar: true,
+          webPreferences: {
+            devTools: false
+          }
+        })
+        win.on('close', function () {
+          win = null;
+        })
+        win.loadURL(originPhoto.src)
+      };
+      originPhoto.src = this.data.photo.originurl
     }
   }
 }
