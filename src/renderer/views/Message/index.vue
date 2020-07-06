@@ -1,7 +1,7 @@
 <template>
   <div>
     <div>
-      <p style="margin: 8px">私信 <span class="text-button">返回</span></p>
+      <p style="margin: 8px">私信 <span class="text-button" @click="$router.push('/timeline')">返回</span></p>
     </div>
     <div v-if="conversations.length > 0" :class="{ direct: hasScroll, scroll: hasScroll }" :style="{ height: viewHeight }" @scroll="handleScroll">
       <b-row v-for="conversation in conversations" :key="conversation.otherid" :class="{ 'direct-conversation': true, 'direct-new': conversation.new_conv}" style="margin: 0;">

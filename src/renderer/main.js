@@ -8,17 +8,17 @@ import store from './store'
 import 'bootstrap/dist/css/bootstrap.css'
 import 'bootstrap-vue/dist/bootstrap-vue.css'
 import './css/style.css'
-import { Layout, FormTextarea, Nav, Card, Button, Image, FormFile, Modal, Spinner, Dropdown } from 'bootstrap-vue/es/components'
-Vue.use(FormTextarea)
-Vue.use(Layout)
-Vue.use(Nav)
-Vue.use(Card)
-Vue.use(Button)
-Vue.use(Image)
-Vue.use(FormFile)
-Vue.use(Modal)
-Vue.use(Spinner)
-Vue.use(Dropdown)
+import { LayoutPlugin, FormTextareaPlugin, NavPlugin, CardPlugin, ButtonPlugin, ImagePlugin, FormFilePlugin, ModalPlugin, SpinnerPlugin, DropdownPlugin } from 'bootstrap-vue'
+Vue.use(FormTextareaPlugin)
+Vue.use(LayoutPlugin)
+Vue.use(NavPlugin)
+Vue.use(CardPlugin)
+Vue.use(ButtonPlugin)
+Vue.use(ImagePlugin)
+Vue.use(FormFilePlugin)
+Vue.use(ModalPlugin)
+Vue.use(SpinnerPlugin)
+Vue.use(DropdownPlugin)
 
 if (!process.env.IS_WEB) Vue.use(require('vue-electron'))
 Vue.http = Vue.prototype.$http = axios
