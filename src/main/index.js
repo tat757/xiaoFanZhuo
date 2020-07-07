@@ -1,4 +1,4 @@
-import { app, BrowserWindow } from 'electron'
+import { app, BrowserWindow, Tray, Menu } from 'electron'
 
 /**
  * Set `__static` path to static files in production
@@ -9,6 +9,7 @@ if (process.env.NODE_ENV !== 'development') {
 }
 
 let mainWindow
+let appIcon
 const winURL = process.env.NODE_ENV === 'development'
   ? `http://localhost:9080`
   : `file://${__dirname}/index.ejs`
@@ -26,8 +27,25 @@ function createWindow () {
   })
   mainWindow.loadURL(winURL)
 
-  mainWindow.on('closed', () => {
-    mainWindow = null
+  mainWindow.on('close', (e) => {
+    e.preventDefault()
+    mainWindow.hide()
+  })
+
+  // setting tray
+  appIcon = new Tray(require('path').join('./static/icon.ico'))
+  const menu = Menu.buildFromTemplate([{
+    label: '退出',
+    click: () => {
+        app.quit()
+        mainWindow = null
+      }
+    }
+  ])
+  appIcon.setToolTip('小饭桌')
+  appIcon.setContextMenu(menu)
+  appIcon.on('click', (e) => {
+    mainWindow.show()
   })
 }
 
