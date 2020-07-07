@@ -3,7 +3,7 @@
     <div class="input-field-left">
       <b-dropdown variant="link" toggle-class="text-decoration-none" no-caret id="menu">
         <template slot="button-content">
-          <b-img :src="avatar" width="48" height="48"/>
+          <b-img :src="avatar" width="48" height="48" style="border-radius: 3px;"/>
         </template>
         <b-dropdown-item @click="() => {handleRedirect('/profile/timeline/' + $store.state.account.userId)}">个人首页</b-dropdown-item>
         <b-dropdown-item @click="handleLogout">注销</b-dropdown-item>

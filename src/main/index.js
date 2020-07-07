@@ -23,7 +23,10 @@ function createWindow () {
     height: 640,
     autoHideMenuBar: true,
     backgroundColor: 'white',
-    resizable: false
+    resizable: false,
+    webPreferences: {
+      nodeIntegration: true
+    }
   })
   mainWindow.loadURL(winURL)
 
@@ -37,8 +40,8 @@ function createWindow () {
   const menu = Menu.buildFromTemplate([{
     label: '退出',
     click: () => {
+        mainWindow.destroy()
         app.quit()
-        mainWindow = null
       }
     }
   ])

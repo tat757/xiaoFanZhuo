@@ -1,7 +1,7 @@
 <template>
   <b-row class="status">
     <div class="status-avatar">
-      <b-img :src="data.user.profile_image_url" width="48"/>
+      <b-img :src="data.user.profile_image_url" width="48" style="border-radius: 3px;"/>
     </div>
     <b-col class="status-middle">
       <p class="status-name"><b><span class="name-link" @click="handleNameClick(data.user.id)">{{data.user.name}}</span></b><span class="status-time">{{createdTime}}</span></p>
