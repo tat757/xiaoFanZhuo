@@ -62,7 +62,7 @@ Fanfou.prototype.getOAuthAccessToken  = (oauth, next) => {
 	})
 }
 Fanfou.prototype.checkToken = (cb) => {
-	if (store.get('access_token') !== '') {
+	if (store.get('access_token') && store.get('access_token') !== '') {
 		fanfou.oauthToken = store.get('access_token')
 		fanfou.oauthTokenSecret = store.get('access_token_secret')
 		return {
