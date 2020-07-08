@@ -1,20 +1,23 @@
 import { app, BrowserWindow, Tray, Menu } from 'electron'
-
+const log = require('electron-log')
 /**
  * Set `__static` path to static files in production
  * https://simulatedgreg.gitbooks.io/electron-vue/content/en/using-static-assets.html
  */
 if (process.env.NODE_ENV !== 'development') {
   global.__static = require('path').join(__dirname, '/static').replace(/\\/g, '\\\\')
+} else {
+  global.__static = __static
 }
 
-let mainWindow
-let appIcon
+let mainWindow = null
+let appIcon = null
 const winURL = process.env.NODE_ENV === 'development'
   ? `http://localhost:9080`
-  : `file://${__dirname}/index.ejs`
+  : `file://${__dirname}/index.html`
 
 function createWindow () {
+  log.info('createWindow called')
   /**
    * Initial window options
    */
@@ -24,11 +27,12 @@ function createWindow () {
     autoHideMenuBar: true,
     backgroundColor: 'white',
     resizable: false,
+    icon: require('path').join(global.__static, 'icon.ico'),
     webPreferences: {
-      nodeIntegration: true
+      nodeIntegration: true,
+      webSecurity: false
     }
   })
-  mainWindow.loadURL(winURL)
 
   mainWindow.on('close', (e) => {
     e.preventDefault()
@@ -36,7 +40,7 @@ function createWindow () {
   })
 
   // setting tray
-  appIcon = new Tray(require('path').join('./static/icon.ico'))
+  appIcon = new Tray(require('path').join(global.__static, 'icon.ico'))
   const menu = Menu.buildFromTemplate([{
     label: '退出',
     click: () => {
@@ -50,6 +54,10 @@ function createWindow () {
   appIcon.on('click', (e) => {
     mainWindow.show()
   })
+  log.info('ready to load url')
+  log.info(winURL)
+  mainWindow.loadURL(winURL)
+  log.info('done to load url')
 }
 
 app.on('ready', createWindow)

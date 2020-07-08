@@ -11,7 +11,7 @@
     "build:darwin": "cross-env BUILD_TARGET=darwin node .electron-vue/build.js",
     "build:linux": "cross-env BUILD_TARGET=linux node .electron-vue/build.js",
     "build:mas": "cross-env BUILD_TARGET=mas node .electron-vue/build.js",
-    "build:win32": "cross-env BUILD_TARGET=win32 node .electron-vue/build.js",
+    "build:win32": "cross-env BUILD_TARGET=electron node .electron-vue/build.js && electron-builder --win",
     "build:clean": "cross-env BUILD_TARGET=clean node .electron-vue/build.js",
     "build:web": "cross-env BUILD_TARGET=web node .electron-vue/build.js",
     "dev": "node .electron-vue/dev-runner.js",
@@ -26,7 +26,6 @@
   "dependencies": {
     "axios": "^0.18.1",
     "bootstrap-vue": "^2.15.0",
-    "electron-promise-ipc": "^1.6.0",
     "electron-store": "^3.3.0",
     "fanfou-sdk": "^4.1.0",
     "oauth": "^0.9.15",
@@ -54,9 +53,10 @@
     "css-loader": "^0.28.11",
     "del": "^3.0.0",
     "devtron": "^1.4.0",
-    "electron": ">=7.2.4",
+    "electron": ">=9.1.0",
     "electron-debug": "^1.5.0",
     "electron-devtools-installer": "^2.2.4",
+    "electron-installer-windows": "^3.0.0",
     "electron-packager": "^13.1.1",
     "electron-rebuild": "^1.11.0",
     "file-loader": "^1.1.11",
@@ -87,5 +87,18 @@
     "webpack-dev-server": "^3.11.0",
     "webpack-hot-middleware": "^2.25.0",
     "webpack-merge": "^4.2.2"
+  },
+  "build": {
+    "productName": "xfz",
+    "appId": "1",
+    "files": [
+      "dist/electron/**/*"
+    ],
+    "win": {
+      "icon": "build/icons/icon.ico",
+      "target": [
+        "zip"
+      ]
+    }
   }
 }
