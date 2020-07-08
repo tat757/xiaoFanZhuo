@@ -1,10 +1,10 @@
 {
   "name": "xiaofanzhuo",
-  "productName": "xiaofanzhuo",
+  "productName": "小饭桌",
   "version": "0.0.1",
-  "author": "",
-  "description": "Rework version with vue",
-  "license": null,
+  "author": "TATx",
+  "description": "饭否桌面客户端",
+  "license": "MIT",
   "main": "./dist/electron/main.js",
   "scripts": {
     "build": "node .electron-vue/build.js",
@@ -21,7 +21,8 @@
     "pack:renderer": "cross-env NODE_ENV=production webpack --progress --colors --config .electron-vue/webpack.renderer.config.js",
     "test": "npm run unit && npm run e2e",
     "unit": "karma start test/unit/karma.conf.js",
-    "postinstall": ""
+    "postinstall": "",
+    "installer": "electron-installer-windows --src dist/win-unpacked/ --dest dist/installers/"
   },
   "dependencies": {
     "axios": "^0.18.1",
@@ -89,7 +90,8 @@
     "webpack-merge": "^4.2.2"
   },
   "build": {
-    "productName": "xfz",
+    "productName": "小饭桌",
+    "copyright": "Copyright © year TATx",
     "appId": "1",
     "files": [
       "dist/electron/**/*"
@@ -97,8 +99,14 @@
     "win": {
       "icon": "build/icons/icon.ico",
       "target": [
+        "nsis",
         "zip"
       ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "perMachine": true
     }
   }
 }

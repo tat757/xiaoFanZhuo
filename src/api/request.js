@@ -90,7 +90,8 @@ Fanfou.prototype.authorize = (cb) => {
 	}
 	else{
 		fanfou.getOAuthRequestToken((oauth) => {
-			const redirectUrl = config.authorizeURL + '?oauth_token=' + oauth.token + '&oauth_callback=http://127.0.0.1:9080/action/authorize/callback'
+      const href = window.location.href
+			const redirectUrl = config.authorizeURL + '?oauth_token=' + oauth.token + '&oauth_callback=' + href.substring(0, href.indexOf('?')) + '/action/authorize/callback'
 			fanfou.token = oauth.token
 			fanfou.token_secret = oauth.token_secret
 			const windowStyle = {
@@ -103,7 +104,7 @@ Fanfou.prototype.authorize = (cb) => {
 			const authWindow = new BrowserWindow(windowStyle)
 			authWindow.loadURL(redirectUrl)
 			authWindow.show()
-			authWindow.webContents.on('did-get-redirect-request', (e, oldUrl, newUrl) => {
+			authWindow.webContents.on('will-redirect', (e, newUrl) => {
 				fanfou.authorizeCallback(newUrl, function () {
 					authWindow.destroy()
 					cb()
