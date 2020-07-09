@@ -54,6 +54,7 @@ const status = {
         } else if (options.isFavorite) {
           url = '/favorites'
           params = options
+          params.format = 'html'
         } else {
           url = '/statuses/home_timeline'
         }
@@ -69,7 +70,8 @@ const status = {
     InitMention() {
       return new Promise((resolve, reject) => {
         const option = {
-          count: 20
+          count: 20,
+          format: 'html'
         }
         fanfou.get('/statuses/mentions', option).then((res) => {
           resolve(res)
@@ -154,6 +156,7 @@ const status = {
       })
     },
     GetNewMention(context, params) {
+      params.format = 'html'
       return new Promise((resolve, reject) => {
         fanfou.get('/statuses/mentions', params).then((res) => {
           resolve(res)
