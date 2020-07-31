@@ -3,12 +3,21 @@ import fanfou from '../../../api/request'
 const status = {
   state: {
     updateTime: 0,
-    cache: {}
+    cache: {},
+    home_timeline: [],
+    mentions: [],
+    dataUpdateTime: 0
   },
   getters: {
     getCache(state) {
       return (id) => {
         return state.cache[id]
+      }
+    },
+    getData(state) {
+      console.log(state)
+      return (type) => {
+        return state[type]
       }
     }
   },
@@ -25,6 +34,10 @@ const status = {
         }
       }
     },
+    setData(state, {type, data}) {
+      state[type] = data
+      state.dataUpdateTime = Date.now()
+    },
     setCacheFavorited(state, status) {
       state.cache[status.id].favorited = status.favorited
     },
@@ -37,6 +50,17 @@ const status = {
     }
   },
   actions: {
+    InitData(context) {
+      return new Promise((resolve, reject) => {
+        fanfou.initData().then(res => {
+          for (const type in res) {
+            context.commit('setData', {type: type, data: res[type]})
+            context.commit('setCache', res[type])
+          }
+          resolve()
+        })
+      })
+    },
     InitTimeline(context, options) {
       options = options || {}
       context.commit('setCache')

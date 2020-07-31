@@ -66,13 +66,12 @@ export default {
         new: true,
         old: true
       }
-      this.$store.dispatch('InitTimeline').then((res) => {
-        this.statuses = res
-        this.requesting = {
-          new: false,
-          old: false
-        }
-      })
+      const res = this.$store.getters.getData('home_timeline')
+      this.statuses = res
+      this.requesting = {
+        new: false,
+        old: false
+      }
     },
     getNewStatus() {
       if (!this.requesting.new) {

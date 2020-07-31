@@ -19,7 +19,7 @@ export default {
   methods: {
     login() {
       this.$store.dispatch('Login').then((data) => {
-        this.$router.push('/timeline')
+        this.$router.push('/welcome')
       }).catch((err) => {
         console.log(err)
       })

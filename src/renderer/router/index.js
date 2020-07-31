@@ -9,6 +9,7 @@ import Profile from '../views/Profile'
 import PersonTimeline from '../views/PersonTimeline'
 import PersonPhoto from '../views/PersonPhoto'
 import PersonFavorite from '../views/PersonFavorite'
+import WelcomePage from '../views/WelcomePage'
 
 import MessageList from '../views/Message/index'
 import Message from '../views/Message/_id'
@@ -74,6 +75,11 @@ export default new Router({
       path: '/login',
       name: 'login',
       component: Login,
+    },
+    {
+      path: '/welcome',
+      name: 'Welcome',
+      component: WelcomePage
     },
     {
       path: '/photoStatus/:id',
