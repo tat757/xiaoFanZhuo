@@ -4,7 +4,12 @@
 export default {
   name: 'Interval',
   mounted() {
-    // getting data intervaly
+    // getting data intervally
+  },
+  methods: {
+    fetchMoreNewData() {
+      
+    }
   }
 }
 </script>

@@ -3,7 +3,13 @@ import fanfou from '../../../api/request'
 const account = {
   state: {
     avatar: '',
-    userId: ''
+    userId: '',
+    isLogin: false
+  },
+  getters: {
+    checkLogin(state) {
+      return state.isLogin
+    }
   },
   mutations: {
     DECREMENT_MAIN_COUNTER (state) {
@@ -17,13 +23,20 @@ const account = {
     },
     SET_USERID (state, id) {
       state.userId = id
+    },
+    LOGIN (state) {
+      state.isLogin = true
+    },
+    LOGOUT (state) {
+      state.isLogin = false
     }
   },
   actions: {
-    Login() {
+    Login(context) {
       return new Promise((resolve, reject) => {
         try {
           fanfou.authorize((data) => {
+            context.commit('LOGIN')
             resolve()
           })
         } catch(err) {
@@ -35,6 +48,7 @@ const account = {
       return new Promise((resolve, reject) => {
         try {
           fanfou.logout().then((res) => {
+            context.commit('LOGOUT')
             resolve()
           })
         } catch (err) {

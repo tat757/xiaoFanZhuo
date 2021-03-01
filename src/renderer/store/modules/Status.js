@@ -5,7 +5,9 @@ const status = {
     updateTime: 0,
     cache: {},
     home_timeline: [],
+    new_home_timeline: 0,
     mentions: [],
+    new_mentions: 0,
     dataUpdateTime: 0
   },
   getters: {
@@ -15,9 +17,11 @@ const status = {
       }
     },
     getData(state) {
-      console.log(state)
       return (type) => {
-        return state[type]
+        return {
+          data: state[type],
+          numNew: 'new_' + type
+        }
       }
     }
   },
@@ -34,8 +38,21 @@ const status = {
         }
       }
     },
-    setData(state, {type, data}) {
-      state[type] = data
+    setData(state, {type, data, isAdd, isPrefix}) {
+      const ids = []
+      for (let i = 0; i < data.length; i++) {
+        ids.push(data[i].id)
+      }
+      if (isAdd) {
+        if (isPrefix) {
+          state['new_' + type] = ids.length
+          state[type] = ids.concat(state[type])
+        } else {
+          state[type] = state[type].concat(ids)
+        }
+      } else {
+        state[type] = ids
+      }
       state.dataUpdateTime = Date.now()
     },
     setCacheFavorited(state, status) {

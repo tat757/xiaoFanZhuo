@@ -41,6 +41,10 @@ fanfou.cacheData = {
 }
 
 let timeout = null
+const requesting = {
+	home_timeline: false,
+	mentions: false
+}
 
 const fetchHomeTimeline = (isInterval) => {
 	const params = {
@@ -52,11 +56,17 @@ const fetchHomeTimeline = (isInterval) => {
 		params.count = 15
 	}
 	return new Promise((resolve, reject) => {
-		fanfou.get('/statuses/home_timeline', params).then((res) => {
-			resolve(res)
-		}).catch(e => {
-			reject(e)
-		})
+		if (requesting.home_timeline) {
+			resolve()
+		} else {
+			requesting.home_timeline = true
+			fanfou.get('/statuses/home_timeline', params).then((res) => {
+				requesting.home_timeline = false
+				resolve(res)
+			}).catch(e => {
+				reject(e)
+			})
+		}
 	})
 }
 
@@ -70,11 +80,17 @@ const fetchMentions = (isInterval) => {
 		params.count = 15
 	}
 	return new Promise((resolve, reject) => {
-		fanfou.get('/statuses/mentions', params).then(res => {
-			resolve(res)
-		}).catch(e => {
-			reject(e)
-		})
+		if (requesting.mentions) {
+			resolve()
+		} else {
+			requesting.mentions = true
+			fanfou.get('/statuses/mentions', params).then(res => {
+				requesting.mentions = false
+				resolve(res)
+			}).catch(e => {
+				reject(e)
+			})
+		}
 	})
 }
 
@@ -90,7 +106,21 @@ const fetchMoreData = () => {
 	]
 	const nextFetching = () => {
 		timeout = setTimeout(() => {
-			fetchMoreDataPromise(promises).then(() => {
+			fetchMoreDataPromise(promises).then(res => {
+				let data = null
+				if (res[0]) {
+					data = fanfou.cacheData.home_timeline.data || []
+					data = res[0].concat(data)
+					fanfou.cacheData.home_timeline.since_id = data[0][0].id
+				}
+				if (res[1]) {
+					data = fanfou.cacheData.mentions.data || []
+					data = res[1].concat(data) 
+					fanfou.cacheData.mentions.since_id = data[1][0].id
+				}
+				if (data) {
+					fanfou.cacheData.hasNew = true
+				}
 				if (timeout) {
 					nextFetching()
 				}
@@ -249,4 +279,58 @@ Fanfou.prototype.uploadPhoto = function (params) {
 		})
 	})
 }
+
+const getRequestType = (url) => {
+	let type = 'regular'
+	switch(url) {
+		case '/statuses/home_timeline': {
+			type = 'home_timeline'
+			break
+		}
+		case '/statuses/mentions': {
+			type = 'mentions'
+			break
+		}
+	}
+	return type
+}
+
+const getRequestMethod = (url) => {
+	switch(url.split('/')[1]) {
+		case 'create':
+		case 'destroy':
+		case 'update':
+			return 'post'
+	}
+	return 'get'
+}
+
+const checkHasNew = () => {
+	const cache = fanfou.cacheData
+	const length = cache.home_timeline.data.length + cache.mentions.data.length
+	fanfou.cacheData.hasNew = length > 0
+}
+
+Fanfou.prototype.fetchData = function (url, params) {
+	let type = 'regular'
+	if (params.since_id) {
+		type = getRequestType(url)
+	}
+	const method = getRequestMethod(url)
+	return new Promise((resolve, reject) => {
+		if (type === 'regular') {
+			fanfou[method](url, params).then(res => {
+				resolve(res)
+			})
+		} else {
+			resolve(fanfou.cacheData[type])
+		}
+	})
+}
+
+Fanfou.prototype.cleanCache = function (type) {
+	this.cacheData[type].data = []
+	checkHasNew()
+}
+
 export default fanfou

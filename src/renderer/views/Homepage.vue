@@ -66,7 +66,7 @@ export default {
         new: true,
         old: true
       }
-      const res = this.$store.getters.getData('home_timeline')
+      const res = this.$store.getters.getData('home_timeline').data
       this.statuses = res
       this.requesting = {
         new: false,
